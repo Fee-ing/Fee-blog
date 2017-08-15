@@ -1,0 +1,19 @@
+
+@font-face {font-family: "iconfont";
+  src: url('../iconfont/iconfont.eot?t=1502160343046');
+  src: url('../iconfont/iconfont.eot?t=1502160343046#iefix') format('embedded-opentype'), 
+  url('../iconfont/iconfont.woff?t=1502160343046') format('woff'), 
+  url('../iconfont/iconfont.ttf?t=1502160343046') format('truetype'), 
+  url('../iconfont/iconfont.svg?t=1502160343046#iconfont') format('svg'); 
+}
+
+.iconfont {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-add:before { content: "\e81a"; }
+.icon-fanhui:before { content: "\e607"; }

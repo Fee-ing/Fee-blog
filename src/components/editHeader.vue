@@ -1,5 +1,6 @@
 <template lang="html">
   <div class="edit-heading">
+    <router-link class="iconfont icon-fanhui back-button" to="*">返回</router-link>
     <div class="edit-heading-container">
       <ul class="editbar-list">
         <li class="editbar-list-item">
@@ -58,6 +59,7 @@
           </ul>
           <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getText">文字<span class="new-icon-down"></span></button>
           <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空" @click.stop="clearOpt">清空</button>
+          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
         </li>
       </ul>
     </div>
@@ -66,7 +68,10 @@
 <script>
 export default {
   props: {
-    
+    content: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -195,7 +200,10 @@ export default {
       document.execCommand('formatBlock', false, '<' + role + '>');
     },
     clearOpt(){
-      document.getElementById('editor').innerHTML = '';
+      this.$emit('clear-html');
+    },
+    saveOpt(){
+      this.$store.dispatch('addArticle', {pic: '', content: this.content});
     }
   }
 }
@@ -204,6 +212,17 @@ export default {
 <style lang="less" scoped>
 button{
 	cursor: pointer;
+}
+.back-button{
+  position: absolute;
+  height: 100%;
+  text-align: center;
+  top: 0;
+  left: 30px;
+  font-size: 14px;
+  &:before{
+    margin-right: 10px;
+  }
 }
 .toolbar-menu{
   position: absolute;
@@ -307,171 +326,158 @@ button{
     }
   }
 }
-.edit-heading{
-  position: absolute;
-  width: 100%;
-  height: 46px;
-  text-align: center;
-  box-shadow: 0 2px 4px hsla(0,0%,8%,.15);
-  background: #f0f0f0;
-  z-index: 100;
-	.edit-heading-container{
-	  display: inline-block;
-	  height: 100%;
-	  .editbar-list{
-	    height: 100%;
-	    padding: 0;
-	    margin: 0;
-	    .editbar-list-item{
-	      user-select: none;
-	      float: left;
-	      height: 100%;
-	      display: -webkit-box;
-	      display: -moz-box;
-	      display: -ms-flexbox;
-	      display: -webkit-flex;
-	      display: flex;
-	      -webkit-box-align: center;
-	      -moz-box-align: center;
-	      -ms-flex-align: center;
-	      -webkit-align-items: center;
-	      align-items: center;
-	      -webkit-box-pack: center;
-	      -moz-box-pack: center;
-	      -ms-flex-pack: center;
-	      -webkit-justify-content: center;
-	      justify-content: center;
-	      position: relative;
-	      &.separator{
-	        border-left: 1px solid #bebebe;
-	        width: 0;
-	        height: 18px;
-	        margin: 16px 10px;
-	      }
-	      .toolbar-item{
-	        display: inline-block;
-	        vertical-align: top;
-	        width: 30px;
-	        height: 27px;
-	        line-height: 28px;
-	        outline: none;
-	        border: none;
-	        background-color: transparent;
-	        background-image: url(../assets/imgs/editor.png);
-	        background-repeat: no-repeat;
-	        background-size: 800px 100px;
-	        position: relative;
-	        &:hover, &.active{
-	          border-radius: 1px;
-	          box-shadow: inset 0 0 0 1px #d6d6d6;
-	          background-color: #e5e5e5;
-	        }
-	        &.toolbar-item-select{
-	          width: 38px;
-	        }
-	        &.undo{
-	          background-position: 0 0;
-	        }
-	        &.redo{
-	          background-position: -30px 0;
-	        }
-	        &.paint-format{
-	          background-position: -479px -27px;
-	        }
-	        &.clear-format{
-	          background-position: -509px -27px;
-	        }
-	        &.bold{
-	          background-position: -60px 0;
-	        }
-	        &.italic{
-	          background-position: -90px 0;
-	        }
-	        &.underline{
-	          background-position: -120px 0;
-	        }
-	        &.strikethrough{
-	          background-position: 0 -27px;
-	        }
-	        &.fontcolor{
-	          background-position: -150px 0;
-	        }
-	        &.backcolor{
-	          background-position: -30px -27px;
-	        }
-	        &.align-toolbar{
-	          background-position: -330px 0;
-	          &.justifyCenter{
-	            background-position: -361px 0;
-	          }
-	          &.justifyRight{
-	            background-position: -391px 0;
-	          }
-	          &.justifyFull{
-	            background-position: -421px 0;
-	          }
-	        }
-	        &.image{
-	          background-position: -511px 0;
-	        }
-	        &.font{
-	          background-image: none;
-	          color: #333;
-	          font-size: 12px;
-	          text-align: left;
-	          width: 48px;
-	          padding-left: 6px;
-	        }
-	        &.fee{
-	          background-position: -601px 0;
-	        }
-	        &.card-list{
-	          background-position: -241px -54px;
-	        }
-	        &.card-block{
-	          background-position: -481px 0;
-	        }
-	        &.button{
-	          width: auto;
-	          padding: 0 8px;
-	          background-image: none;
-	          color: #333;
-	          font-size: 12px;
-	          text-align: center;
-	        }
-	        .new-icon-down{
-	          position: absolute;
-	          width: 5px;
-	          height: 100%;
-	          background-image: url(../assets/imgs/editor.png);
-	          background-repeat: no-repeat;
-	          background-size: 800px 100px;
-	          background-position: -642px 0;
-	          right: 7px;
-	          top: 0;
-	        }
-	        .toolbar-select{
-	          position: absolute;
-	          top: 0;
-	          left: 0;
-	          cursor: pointer;
-	          width: 100%;
-	          height: 100%;
-	          outline: none;
-	          border: none;
-	          opacity: 0;
-	        }
-	        .line{
-	          position: absolute;
-	          bottom: 3px;
-	          width: 11px;
-	          height: 2px;
-	          left: 9px;
-	          background-color: transparent;
-	        }
-	      }
-	    }
-	  }
-	}
+.editbar-list{
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  .editbar-list-item{
+    user-select: none;
+    float: left;
+    height: 100%;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    position: relative;
+    &.separator{
+      border-left: 1px solid #bebebe;
+      width: 0;
+      height: 18px;
+      margin: 16px 10px;
+    }
+    .toolbar-item{
+      display: inline-block;
+      vertical-align: top;
+      width: 30px;
+      height: 27px;
+      line-height: 28px;
+      outline: none;
+      border: none;
+      background-color: transparent;
+      background-image: url(../assets/imgs/editor.png);
+      background-repeat: no-repeat;
+      background-size: 800px 100px;
+      position: relative;
+      &:hover, &.active{
+        border-radius: 1px;
+        box-shadow: inset 0 0 0 1px #d6d6d6;
+        background-color: #e5e5e5;
+      }
+      &.toolbar-item-select{
+        width: 38px;
+      }
+      &.undo{
+        background-position: 0 0;
+      }
+      &.redo{
+        background-position: -30px 0;
+      }
+      &.paint-format{
+        background-position: -479px -27px;
+      }
+      &.clear-format{
+        background-position: -509px -27px;
+      }
+      &.bold{
+        background-position: -60px 0;
+      }
+      &.italic{
+        background-position: -90px 0;
+      }
+      &.underline{
+        background-position: -120px 0;
+      }
+      &.strikethrough{
+        background-position: 0 -27px;
+      }
+      &.fontcolor{
+        background-position: -150px 0;
+      }
+      &.backcolor{
+        background-position: -30px -27px;
+      }
+      &.align-toolbar{
+        background-position: -330px 0;
+        &.justifyCenter{
+          background-position: -361px 0;
+        }
+        &.justifyRight{
+          background-position: -391px 0;
+        }
+        &.justifyFull{
+          background-position: -421px 0;
+        }
+      }
+      &.image{
+        background-position: -511px 0;
+      }
+      &.font{
+        background-image: none;
+        color: #333;
+        font-size: 12px;
+        text-align: left;
+        width: 48px;
+        padding-left: 6px;
+      }
+      &.fee{
+        background-position: -601px 0;
+      }
+      &.card-list{
+        background-position: -241px -54px;
+      }
+      &.card-block{
+        background-position: -481px 0;
+      }
+      &.button{
+        width: auto;
+        padding: 0 8px;
+        background-image: none;
+        color: #333;
+        font-size: 12px;
+        text-align: center;
+      }
+      .new-icon-down{
+        position: absolute;
+        width: 5px;
+        height: 100%;
+        background-image: url(../assets/imgs/editor.png);
+        background-repeat: no-repeat;
+        background-size: 800px 100px;
+        background-position: -642px 0;
+        right: 7px;
+        top: 0;
+      }
+      .toolbar-select{
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        outline: none;
+        border: none;
+        opacity: 0;
+      }
+      .line{
+        position: absolute;
+        bottom: 3px;
+        width: 11px;
+        height: 2px;
+        left: 9px;
+        background-color: transparent;
+      }
+    }
+  }
 }
 </style>

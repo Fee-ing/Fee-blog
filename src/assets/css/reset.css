@@ -1,8 +1,21 @@
+@font-face {
+  font-family: 'feefont';
+  src: url('../font/feefont.eot');
+  src:
+    url('../font/feefont.eot?#iefix') format('embedded-opentype'),
+    url('../font/feefont.woff') format('woff'),
+    url('../font/feefont.ttf') format('truetype'),
+    url('../font/feefont.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+*{font-family: 'feefont','Avenir', Helvetica, Arial, sans-serif;}
 body {margin:0; padding:0; font:12px/1.5 helvetica,arial,sans-serif,"\5b8b\4f53";}
 div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,blockquote,p{padding:0; margin:0;box-sizing: border-box;}
 table,td,tr,th{font-size:12px;}
 ol,ul {list-style:none;}
 li{list-style-type:none;}
+a{color: #333;text-decoration: none;cursor: pointer;}
 img{vertical-align:top;border:0;}
 address,cite,code,em,th,i{font-weight:normal; font-style:normal;}
 .clearfix{*zoom:1;}

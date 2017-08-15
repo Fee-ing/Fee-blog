@@ -1,0 +1,33 @@
+.flex-box{
+    display: -webkit-box;
+    display: -moz-box;
+}
+.flex1{
+    display: -webkit-box;
+    -webkit-box-flex:1;
+    display: -moz-box;
+    -moz-box-flex:1;
+}
+.verticalbox{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-box-pack:center;
+    display:-moz-box;
+    -moz-box-orient:vertical;
+    -moz-box-pack:center;
+}
+.equalHeight{
+  &:before{
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+    width: 0px;
+  }
+}
+.paper {
+    background-color: #fff;
+    border: 1px solid #eee;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 60px rgba(0, 0, 0, 0.06) inset;
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset; 
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+}

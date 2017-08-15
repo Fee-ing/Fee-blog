@@ -1,44 +1,20 @@
 <template>
   <div id="app">
-    <div class="editor-wrapper">
-      <edit-header></edit-header>
-      <div class="editor-content">
-        <div id="editor" class="editor" contenteditable="true" @input="getHtml" @focus="initHtml" @blur="formatHtml">{{placeholder}}</div>
-      </div>
-    </div>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
 <script>
-import editHeader from './components/editHeader.vue'
 
 export default {
-  data(){
-    return {
-      editHtml: '',
-      placeholder: '请输入内容...'
-    }
-  },
-  components: {
-    editHeader
-  },
-  methods: {
-    initHtml() {
-      this.placeholder = '';
-    },
-    formatHtml() {
-      
-    },
-    getHtml(e) {
-      this.editHtml = e.currentTarget.innerHTML;
-    }
-  }
+  name: 'app'
 }
 </script>
 
 <style lang="less">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: fixed;
@@ -50,25 +26,40 @@ export default {
   color: #333;
   font-size: 15px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #f3f5f9;
   .editor-wrapper{
     height: 100%;
+    .edit-heading{
+      position: fixed;
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      box-shadow: 0 2px 4px hsla(0,0%,8%,.15);
+      background: #f0f0f0;
+      z-index: 100;
+      .edit-heading-container{
+        display: inline-block;
+        height: 100%;
+      }
+    }
     .editor-content{
+      position: relative;
       width: 800px;
+      min-width: 800px;
       height: 100%;
       overflow: hidden;
       margin: 0 auto;
       background-color: #fff;
-      padding: 70px 40px 30px;
-      box-shadow: 0 1px 6px #999;
-      .editor{
+      padding-top: 50px;
+      box-shadow: 0 2px 4px hsla(0,0%,8%,.15);
+      .content-wrapper{
         height: 100%;
-        overflow-y: auto;
+        padding: 50px 50px 0px;
         overflow-x: hidden;
-        outline: none;
+        overflow-y: auto;
       }
     }
   }
 }
-
 </style>
