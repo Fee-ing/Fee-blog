@@ -46,6 +46,8 @@
     "vuex": "^2.0.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.3.3",
+    "lrz": "",
+    "blueimp-md5": "",
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.2.1",
     "webpack-dev-middleware": "^1.10.0",

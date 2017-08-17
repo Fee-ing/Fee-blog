@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="edit-heading">
-    <router-link class="iconfont icon-fanhui back-button" to="*">返回</router-link>
+    <router-link class="iconfont icon-fanhui heading-button back-button" to="*">返回</router-link>
     <div class="edit-heading-container">
       <ul class="editbar-list">
         <li class="editbar-list-item">
@@ -58,7 +58,11 @@
             <li class="menu-list-item"><button type="button" unselectable="on" title="小标题" @click.stop="addText('h3')">小标题</button></li>
           </ul>
           <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getText">文字<span class="new-icon-down"></span></button>
-          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空" @click.stop="clearOpt">清空</button>
+          <button type="button" unselectable="on" class="toolbar-item image" title="图片">
+            <input type="file" accept="*.png,*.jpg,*.jpeg" unselectable="on" class="image-input" @change.stop="addImg">
+          </button>
+          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空内容" @click.stop="clearOpt">清空内容</button>
+          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2'" @click.stop="deleteOpt">删除文章</button>
           <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
         </li>
       </ul>
@@ -66,11 +70,13 @@
   </div>
 </template>
 <script>
+import lrz from 'lrz'
+
 export default {
   props: {
-    content: {
+    type: {
       type: String,
-      default: ''
+      default: '1'
     }
   },
   data() {
@@ -91,17 +97,31 @@ export default {
       fontsizeText: '字号',
       fontColorText: 'transparent',
       backColorText: 'transparent',
-      alignText: ''
+      alignText: '',
+      pic: ''
     }
   },
   mounted() {
   	let that = this;
   	document.onclick = function(e) {
   	  that.init();
-  	  e.preventDefault();
+  	  // e.preventDefault();
   	}
   },
   methods: {
+    doGetCaretPosition(oField) {
+      var iCaretPos = 0;
+      if (document.selection) {
+        oField.focus();
+        var oSel = document.selection.createRange();
+        oSel.moveStart('character', -oField.innerHTML.length);
+        iCaretPos = oSel.text.length;
+      }else if (oField.selectionStart || oField.selectionStart == '0') {
+        iCaretPos = oField.selectionStart;
+      }
+      console.log(iCaretPos)
+      return iCaretPos;
+    },
     init(){
       this.fontsizeText = '字号';
       this.fontColorText = 'transparent';
@@ -199,31 +219,31 @@ export default {
     addText(role){
       document.execCommand('formatBlock', false, '<' + role + '>');
     },
+    addImg(){
+      let that = this;
+      lrz(event.target.files[0])
+            .then(function (rst) {
+              that.pic = rst.base64;
+              that.$emit('add-img', rst.base64);
+            })
+            .catch(function (err) {
+              toast('图片上传失败');
+            });
+    },
     clearOpt(){
       this.$emit('clear-html');
     },
+    deleteOpt(){
+      this.$emit('deltet-article');
+    },
     saveOpt(){
-      this.$store.dispatch('addArticle', {pic: '', content: this.content});
+      this.$emit('add-article');
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-button{
-	cursor: pointer;
-}
-.back-button{
-  position: absolute;
-  height: 100%;
-  text-align: center;
-  top: 0;
-  left: 30px;
-  font-size: 14px;
-  &:before{
-    margin-right: 10px;
-  }
-}
 .toolbar-menu{
   position: absolute;
   top: 48px;
@@ -421,6 +441,17 @@ button{
       }
       &.image{
         background-position: -511px 0;
+        position: relative;
+        .image-input{
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          opacity: 0;
+          font-size: 0;
+          cursor: pointer;
+        }
       }
       &.font{
         background-image: none;
@@ -429,6 +460,7 @@ button{
         text-align: left;
         width: 48px;
         padding-left: 6px;
+        line-height: 25px;
       }
       &.fee{
         background-position: -601px 0;

@@ -6,7 +6,9 @@ const router = new VueRouter({
   routes:[{
     path:'/index',component:require('../views/index')
   },{
-    path:'/add',component:require('../views/add')
+    path:'/login',component:require('../views/login')
+  },{
+    path:'/article',component:require('../views/article')
   },{
     path:'/edit',component:require('../views/edit')
   },{

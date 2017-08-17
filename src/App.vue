@@ -26,7 +26,7 @@ export default {
   color: #333;
   font-size: 15px;
   overflow: hidden;
-  background-color: #f3f5f9;
+  background-color: #fff;
   .editor-wrapper{
     height: 100%;
     .edit-heading{
@@ -52,7 +52,7 @@ export default {
       margin: 0 auto;
       background-color: #fff;
       padding-top: 50px;
-      box-shadow: 0 2px 4px hsla(0,0%,8%,.15);
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
       .content-wrapper{
         height: 100%;
         padding: 50px 50px 0px;
