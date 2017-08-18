@@ -8,6 +8,8 @@ const router = new VueRouter({
   },{
     path:'/login',component:require('../views/login')
   },{
+    path:'/setting',component:require('../views/setting')
+  },{
     path:'/article',component:require('../views/article')
   },{
     path:'/edit',component:require('../views/edit')

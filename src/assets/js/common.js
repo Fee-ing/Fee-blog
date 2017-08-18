@@ -18,7 +18,7 @@ var Func = {
 	delCookie: function(name) {
 	  	let exp = new Date();
 	  	exp.setTime(exp.getTime() - 1);
-	  	let cval=getCookie(name);
+	  	let cval = this.getCookie(name);
 	  	if (cval) {
 	  		document.cookie= name + "="+cval+";expires="+exp.toGMTString();
 	  	}

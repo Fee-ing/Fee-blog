@@ -1,20 +1,31 @@
 <template>
-  	<div class="editor-wrapper">  
+  	<div class="editor-wrapper" @click="closeUser">  
   		<div class="edit-heading">
-  			<a class="iconfont icon-people heading-button login-button" v-if="userInfo">{{userInfo.username}}</a>
+  			<template v-if="userInfo">
+	  			<a class="heading-button login-button" :title="userInfo.nickname ? '帐号：'+userInfo.username : ''" @click.stop="showUser">
+	  				<div class="avatar" v-if="userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></div>
+	  				<div class="avatar avatar-default" v-else></div>
+	  				<span class="name">{{userInfo.nickname ? userInfo.nickname : userInfo.username}}</span>
+	  			</a>
+	  			<ul class="user-wrapper" v-show="userInfo && isShowUser">
+	  				<!-- <li class="user-item"><a class="user-item-btn">我的主页</a></li> -->
+	  				<li class="user-item"><router-link class="user-item-btn" to="/setting">个人资料</router-link></li>
+	  				<li class="user-item"><a class="user-item-btn" @click="logoutOpt">退出登录</a></li>
+	  			</ul>
+  			</template>
   			<router-link class="iconfont icon-people heading-button login-button" to="/login" v-else-if="!userInfo">登录/注册</router-link>
-  			<h1 class="edit-heading-title" @click="refresh">晚来天欲雨，可饮一杯无？</h1>
-  			<router-link class="iconfont icon-add heading-button add-button" to="/article"></router-link>
+  			<h1 class="edit-heading-title" @click="refresh">Say&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Something</h1>
+  			<a class="iconfont icon-add heading-button add-button" @click="addArticle"></a>
   		</div>
     	<div class="editor-content">
 	      	<div class="content-wrapper">
 	      		<div class="content-list paper" v-for="item in articleList">
-	      			<div class="list-wrapper" @click.stop="showParagraph">
+	      			<div class="list-wrapper" @click="showParagraph">
 	      				<div class="first-img" v-if="item.attributes.pic" :style="{ backgroundImage: 'url(' + item.attributes.pic + ')'}"></div>
 	      	  			<div class="paragraph" v-html="item.attributes.content"></div>
 	      			</div>
 	      			<div class="option-wrapper">
-	      				<router-link class="option-btn iconfont icon-bianji" :to="{ path:'/article', query: {id: item.id} }">编辑</router-link>  
+	      				<router-link class="option-btn iconfont icon-bianji" v-if="userInfo && item.attributes.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.id} }">编辑</router-link>  
 	      				<span class="time">{{item.attributes.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
 	      			</div>
 	      		</div>
@@ -30,11 +41,14 @@ import { mapGetters } from 'vuex'
 export default {
   	data(){
     	return {
-      
+      		isShowUser: false
     	}
   	},
   	created() {
-  		this.$store.dispatch('getArticleList')
+  		this.$store.dispatch('getArticleList');
+  		if (this.userInfo) {
+  			this.$store.dispatch('getUser', {id: this.userInfo.objectId, sessionToken: this.userInfo.sessionToken});
+  		}
   	},
   	computed: {
   		...mapGetters(['articleList']),
@@ -57,11 +71,30 @@ export default {
   		refresh() {
   			this.$store.dispatch('getArticleList')
   		},
+  		showUser() {
+  			let bol = !this.isShowUser;
+  			this.isShowUser = bol;
+  		},
+  		closeUser() {
+  			if (this.isShowUser) {
+  				this.isShowUser = false;
+  			}
+  		},
   		showParagraph() {
   			if (event.currentTarget.className.indexOf('open') >= 0) {
   				event.currentTarget.className = 'list-wrapper';
   			}else {
   				event.currentTarget.className = 'list-wrapper open';
+  			}
+  		},
+  		logoutOpt() {
+  			this.$store.dispatch('logout')
+  		},
+  		addArticle() {
+  			if (this.userInfo) {
+  				this.$router.push({path: '/article'});
+  			} else {
+  				this.$router.push({path: '/login'});
   			}
   		}
   	}
@@ -75,6 +108,41 @@ export default {
 	marign: 0 auto;
 	font-size: 18px;
 	cursor: pointer;
+}
+.user-wrapper{
+	position: absolute;
+	left: 10px;
+	top: 48px;
+	padding: 15px 20px;
+	background: #fff;
+  	box-shadow: 0 1px 6px rgba(99,99,99,.2);
+  	border: 1px solid rgba(99,99,99,.2);
+  	border-radius: 7px;
+  	&:after{
+    	content: " ";
+    	position: absolute;
+    	width: 0;
+    	height: 0;
+    	border-left: 7px solid transparent;
+    	border-right: 7px solid transparent;
+    	border-bottom: 7px solid #fff;
+    	top: -7px;
+    	background: none;
+    	left: 50%;
+    	margin-left: -6px;
+  	}
+	.user-item{
+		height: auto;
+		.user-item-btn{
+			display: block;
+			height: 34px;
+			line-height: 34px;
+			font-size: 14px;
+			&:hover{
+				color: #666;
+			}
+		}
+	}
 }
 .login-button{
 	left: 30px;

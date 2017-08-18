@@ -13,7 +13,7 @@ const store = new Vuex.Store({
   state: {
     userInfo: userInfo ? JSON.parse(userInfo) : null,
     articleList: [],
-    article: ''
+    article: {}
   },
   mutations,
   actions,

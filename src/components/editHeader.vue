@@ -59,10 +59,10 @@
           </ul>
           <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getText">文字<span class="new-icon-down"></span></button>
           <button type="button" unselectable="on" class="toolbar-item image" title="图片">
-            <input type="file" accept="*.png,*.jpg,*.jpeg" unselectable="on" class="image-input" @change.stop="addImg">
+            <input type="file" accept="*.png,*.jpg,*.jpeg,*gif" unselectable="on" class="image-input" @change.stop="addImg">
           </button>
           <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空内容" @click.stop="clearOpt">清空内容</button>
-          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2'" @click.stop="deleteOpt">删除文章</button>
+          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2' && userid === userInfo.objectId" @click.stop="deleteOpt">删除文章</button>
           <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
         </li>
       </ul>
@@ -71,12 +71,18 @@
 </template>
 <script>
 import lrz from 'lrz'
+import Func from '../assets/js/common.js'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
     type: {
       type: String,
       default: '1'
+    },
+    userid: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -101,6 +107,9 @@ export default {
       pic: ''
     }
   },
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
   mounted() {
   	let that = this;
   	document.onclick = function(e) {
@@ -109,19 +118,6 @@ export default {
   	}
   },
   methods: {
-    doGetCaretPosition(oField) {
-      var iCaretPos = 0;
-      if (document.selection) {
-        oField.focus();
-        var oSel = document.selection.createRange();
-        oSel.moveStart('character', -oField.innerHTML.length);
-        iCaretPos = oSel.text.length;
-      }else if (oField.selectionStart || oField.selectionStart == '0') {
-        iCaretPos = oField.selectionStart;
-      }
-      console.log(iCaretPos)
-      return iCaretPos;
-    },
     init(){
       this.fontsizeText = '字号';
       this.fontColorText = 'transparent';
@@ -221,13 +217,13 @@ export default {
     },
     addImg(){
       let that = this;
-      lrz(event.target.files[0])
+      lrz(event.currentTarget.files[0])
             .then(function (rst) {
               that.pic = rst.base64;
               that.$emit('add-img', rst.base64);
             })
             .catch(function (err) {
-              toast('图片上传失败');
+              Func.toast('图片上传失败');
             });
     },
     clearOpt(){

@@ -17,9 +17,9 @@
 	      			</div>
 	      		</div>
 	      		<div class="login-btn-wrapper">
-	      			<a class="login-btn verticalbox" @click="submitOpt">{{type === '1' ? '登录' : '注册'}}</a>
+	      			<a class="login-btn option-button" @click="submitOpt">{{type === '1' ? '登录' : '注册'}}</a>
 	      			<a class="option-btn login-regist-btn verticalbox" @click="changeType">{{type === '1' ? '注册' : '登录'}}</a>
-	      			<a class="option-btn forget-btn verticalbox">忘记密码</a>
+	      			<a class="option-btn forget-btn verticalbox" @click="forgetPass">忘记密码</a>
 	      		</div>
 	      	</div>
     	</div>
@@ -66,6 +66,9 @@ export default {
   		},
   		changeType() {
   			this.type === '1' ? this.type = '2' : this.type = '1';
+  		},
+  		forgetPass() {
+  			Func.toast('待开放');
   		},
   		judgePass() {
   			let passReg = /^[a-z0-9]+$/g;
@@ -184,14 +187,6 @@ export default {
 				.login-btn{
 					height: 100%;
 					width: 40%;
-					background-color: #444;
-					color: #fff;
-					border-radius: 3px;
-					-webkit-user-select: none;
-					user-select: none;
-					&:hover{
-						background-color: #555;
-					}
 				}
 				.option-btn{
 					height: 100%;

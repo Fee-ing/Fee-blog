@@ -11,6 +11,20 @@
     width: 0px;
   }
 }
+.option-button{
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    font-size: 13px;
+    background-color: #444;
+    color: #fff;
+    border-radius: 3px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.option-button:hover{
+    background-color: #555;
+}
 .heading-button{
     position: absolute;
     height: 100%;
@@ -108,4 +122,21 @@ img{
 }
 .list-wrapper.open img{
     display: block;
+}
+.name{
+    margin-left: 10px;
+    color: #000;
+    font-size: 16px;
+}
+.avatar{
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    
+}
+.avatar.avatar-default{
+    background-image: url(../imgs/default-avatar.png);
 }

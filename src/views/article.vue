@@ -1,8 +1,8 @@
 <template>
   <div class="editor-wrapper">
-    <edit-header :type="type" @add-img="addImg" @clear-html="clearHtml" @deltet-article="deleteArticleOpt" @add-article="submitArticleOpt"></edit-header>
+    <edit-header :type="type" :userid="article.userid" @add-img="addImg" @clear-html="clearHtml" @deltet-article="deleteArticleOpt" @add-article="submitArticleOpt"></edit-header>
     <div class="editor-content">
-      <div id="content-wrapper" class="content-wrapper" contenteditable="true" v-html="article"></div>
+      <div id="content-wrapper" class="content-wrapper" contenteditable="true" v-html="article.content"></div>
     </div>
   </div>
 </template>
@@ -26,7 +26,8 @@ export default {
     this.fetchData();
   },
   computed: {
-      ...mapGetters(['article'])
+      ...mapGetters(['article']),
+      ...mapGetters(['userInfo'])
   },
   watch: {
     '$route': 'fetchData'
@@ -98,15 +99,16 @@ export default {
     submitArticleOpt() {
       if (this.contentWrapper.innerHTML) {
         let picSrc = this.getPicSrc(this.contentWrapper.innerHTML);
-        let article = {
+        let option = {
           type: this.type, 
           pic: picSrc, 
-          content: this.contentWrapper.innerHTML
+          content: this.contentWrapper.innerHTML,
+          userid: this.userInfo.objectId
         }
         if (this.$route.query.id) {
-          article.id = this.$route.query.id;
+          option.id = this.$route.query.id;
         }
-        this.$store.dispatch('submitArticle', article);
+        this.$store.dispatch('submitArticle', option);
       } 
     }
   }
