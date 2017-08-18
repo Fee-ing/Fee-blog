@@ -1,13 +1,13 @@
 <template>
   	<div class="editor-wrapper">  
   		<div class="edit-heading">
-  			<router-link class="iconfont icon-fanhui heading-button back-button" to="*">返回</router-link>
+  			<router-link class="iconfont icon-fanhui heading-button back-button" to="/">返回</router-link>
   		</div>
     	<div class="editor-content">
 	      	<ul class="setting-wrapper">
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">头像：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<div class="avatar" v-if="type === '1' && userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></div>
 	      				<div class="avatar avatar-default" v-else-if="type === '1' && !userInfo.avatar"></div>
 	      				<div class="avatar avatar-btn iconfont icon-paizhao" v-else-if="type === '2' && userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}">
@@ -18,22 +18,22 @@
 	      				</div>
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">昵称：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.nickname ? userInfo.nickname : '未设置'}}</p>
 	      				<input class="input nickname-input" type="text" placeholder="昵称" v-else-if="type === '2'" v-model="userInfo.nickname">
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">帐号：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p>{{userInfo.username}}</p>
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">性别：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.sex ? userInfo.sex : '未设置'}}</p>
 	      				<div class="sex-rapper" v-else-if="type === '2'">
 	      					<input type="radio" name="sex" value="男" v-model="userInfo.sex">
@@ -43,28 +43,28 @@
 	      				</div>
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">邮箱：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.email ? userInfo.email : '未设置'}}</p>
 	      				<input class="input" type="email" placeholder="邮箱" v-else-if="type === '2'" v-model="userInfo.email">
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">位置：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.location ? userInfo.location : '未设置'}}</p>
 	      				<input class="input" type="text" placeholder="位置" v-else-if="type === '2'" v-model="userInfo.location">
 	      			</div>
 	      		</li>
-	      		<li class="setting-item">
+	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">签名：</span>
-	      			<div class="setting-item-wrapper">
+	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.sign ? userInfo.sign : '未设置'}}</p>
 	      				<textarea class="input sign-input" placeholder="签名" v-else-if="type === '2'" v-model="userInfo.sign"></textarea>
 	      			</div>
 	      		</li>
-	      		<li class="setting-item verticalbox">
+	      		<li class="setting-item centerVertical">
 	      			<a class="option-button edit-save-button" @click="editSaveOpt">{{type === '1' ? '编辑' : '保存'}}</a>
 	      			<a class="option-button edit-save-button" @click="cancelOpt" v-if="type === '2'">取消</a>
 	      		</li>
@@ -158,9 +158,7 @@ export default {
 		margin: 0 auto;
 		padding-top: 50px;
 		.setting-item{
-			display:flex;
 			min-height: 50px;
-		    align-items:center;
 		    margin: 15px 0;
 			.setting-item-title{
 				width: 200px;
@@ -168,8 +166,6 @@ export default {
 				margin-right: 50px;
 			}
 			.setting-item-wrapper{
-				display:flex;
-		    	align-items:center;
 				.avatar{
 					width: 80px;
 					height: 80px;

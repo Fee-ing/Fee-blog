@@ -1,7 +1,46 @@
-.verticalbox{
-    display:flex;
-    align-items:center;
+.flexbox{
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex; 
+    display: flex; 
+}
+.centerbox{
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex; 
+    display: flex; 
+    -webkit-box-pack: center;
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
     justify-content: center;
+}
+.verticalbox{
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex; 
+    display: flex; 
+    -webkit-box-align: center;
+    -moz-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+.centerVertical{
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex; 
+    display: flex; 
+    -webkit-box-pack: center;
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -moz-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
 }
 .equalHeight{
   &:before{
@@ -40,7 +79,10 @@
 }
 .heading-button.back-button{
     left: 30px;
-    font-size: 12px;
+    font-size: 14px;
+}
+.heading-button.back-button::before{
+    margin-right: 10px;
 }
 .toast{
     position: fixed;
@@ -126,7 +168,7 @@ img{
 .name{
     margin-left: 10px;
     color: #000;
-    font-size: 16px;
+    font-size: 14px;
 }
 .avatar{
     width: 30px;

@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="edit-heading">
-    <router-link class="iconfont icon-fanhui heading-button back-button" to="*">返回</router-link>
+    <router-link class="iconfont icon-fanhui heading-button back-button" to="/">返回</router-link>
     <div class="edit-heading-container">
       <ul class="editbar-list">
         <li class="editbar-list-item">
@@ -114,7 +114,6 @@ export default {
   	let that = this;
   	document.onclick = function(e) {
   	  that.init();
-  	  // e.preventDefault();
   	}
   },
   methods: {

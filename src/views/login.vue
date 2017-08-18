@@ -1,11 +1,11 @@
 <template>
   	<div class="editor-wrapper">  
   		<div class="edit-heading">
-  			<router-link class="iconfont icon-fanhui heading-button back-button" to="*">返回</router-link>
+  			<router-link class="iconfont icon-fanhui heading-button back-button" to="/">返回</router-link>
   		</div>
-    	<div class="login-content verticalbox">
+    	<div class="login-content centerVertical">
 	      	<div class="login-box-wrapper paper">
-	      		<div class="login-box verticalbox">
+	      		<div class="login-box centerVertical">
 	      			<div class="common-form login-form" v-show="type === '1'">
 	      				<input type="text" class="common-input" placeholder="手机号" v-model="login.username">
 	      				<input type="password" class="common-input" placeholder="密码" v-model="login.password">
@@ -16,10 +16,10 @@
 	      				<input type="password" class="common-input" placeholder="确认密码" v-model="regist.confirmPass" @blur="confrimOpt">
 	      			</div>
 	      		</div>
-	      		<div class="login-btn-wrapper">
+	      		<div class="login-btn-wrapper flexbox">
 	      			<a class="login-btn option-button" @click="submitOpt">{{type === '1' ? '登录' : '注册'}}</a>
-	      			<a class="option-btn login-regist-btn verticalbox" @click="changeType">{{type === '1' ? '注册' : '登录'}}</a>
-	      			<a class="option-btn forget-btn verticalbox" @click="forgetPass">忘记密码</a>
+	      			<a class="option-btn login-regist-btn centerVertical" @click="changeType">{{type === '1' ? '注册' : '登录'}}</a>
+	      			<a class="option-btn forget-btn centerVertical" @click="forgetPass">忘记密码</a>
 	      		</div>
 	      	</div>
     	</div>
@@ -68,7 +68,7 @@ export default {
   			this.type === '1' ? this.type = '2' : this.type = '1';
   		},
   		forgetPass() {
-  			Func.toast('待开放');
+  			Func.toast('忘就忘了呗');
   		},
   		judgePass() {
   			let passReg = /^[a-z0-9]+$/g;
@@ -181,7 +181,6 @@ export default {
 				}
 			}
 			.login-btn-wrapper{
-				display: flex;
 				height: 13%;
 				font-size: 13px;
 				.login-btn{

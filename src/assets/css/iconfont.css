@@ -13,9 +13,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.iconfont::before{
-  margin-right: 10px;
-}
 
 .icon-bianji:before { content: "\e60a"; }
 
@@ -29,6 +26,6 @@
 
 .icon-xihuan1:before { content: "\e63c"; }
 
-.icon-people:before { content: "\e600"; }
+.icon-fanhuidingbu:before { content: "\e60b"; }
 
 .icon-paizhao:before { content: "\e634"; }
