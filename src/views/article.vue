@@ -37,6 +37,7 @@ export default {
       let id = this.$route.query.id || null;
       this.type = id ? '2' : '1';
       this.$store.dispatch('getArticle', id);
+      this.contentWrapper.innerHTML = '';
     },
     insertHtmlAtCaret(str) {
       let that = this;
@@ -81,7 +82,6 @@ export default {
       } else {
         return '';
       }
-      
     },
     addImg(url) {
       this.contentWrapper.focus();
@@ -103,8 +103,12 @@ export default {
           type: this.type, 
           pic: picSrc, 
           content: this.contentWrapper.innerHTML,
-          userid: this.userInfo.objectId
-        }
+          userid: this.userInfo.objectId,
+          nickname: this.userInfo.nickname,
+          avatar: this.userInfo.avatar,
+          location: this.userInfo.location,
+          sign: this.userInfo.sign
+        };
         if (this.$route.query.id) {
           option.id = this.$route.query.id;
         }

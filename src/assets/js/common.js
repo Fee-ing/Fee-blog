@@ -43,7 +43,7 @@ var Func = {
 	  	}, 300);
 	},
 	formatTime: function(time) {
-		let date = time;
+		let date = new Date(time);
   		let Y, M, D, h, m, s;
   		Y = date.getFullYear() + '-';
   		M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';

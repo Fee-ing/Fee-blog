@@ -17,23 +17,36 @@
 				<div class="avatar avatar-default"></div>
   				<span class="name">登录/注册</span>
   			</router-link>
-  			<h1 class="edit-heading-title" @click="refresh">Say&nbsp;&nbsp;&nbsp;Something</h1>
+  			<h1 class="edit-heading-title" @click="refresh">Fee's&nbsp;&nbsp;Zone</h1>
   			<a class="iconfont icon-add heading-button add-button" @click="addArticle"></a>
   		</div>
     	<div class="editor-content">
 	      	<div id="content-wrapper" class="content-wrapper">
 	      		<div class="content-list" v-for="item in articleList">
-	      			<div class="list-wrapper flexbox" @click="showParagraph">
-	      				<div class="first-img" v-if="item.attributes.pic" :style="{ backgroundImage: 'url(' + item.attributes.pic + ')'}"></div>
-	      	  			<div class="paragraph flexbox" v-html="item.attributes.content"></div>
+	      			<div class="info-wrapper flexbox border-bottom">
+	      				<div class="avatar info-avatar" v-if="item.avatar" :style="{ backgroundImage: 'url(' + item.avatar + ')'}"></div>
+	      				<div class="avatar info-avatar avatar.avatar-default" v-else></div>
+	      				<div class="info-content flex1">
+	      					<div class="info-name"><b>{{item.nickname ? item.nickname : '黑户'}}</b>&nbsp;&nbsp;{{item.location ? '('+item.location+')' : ''}}</div>
+	      					<div class="info-sign">{{item.sign ? item.sign : '这人很懒，什么都没留下'}}</div>
+	      				</div>
+	      				<router-link class="edit-btn verticalbox iconfont icon-bianji" v-if="userInfo && item.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.objectId} }">编辑</router-link>  
 	      			</div>
-	      			<div class="option-wrapper">
-	      				<router-link class="option-btn iconfont icon-bianji" v-if="userInfo && item.attributes.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.id} }">编辑</router-link>  
-	      				<span class="time">{{item.attributes.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
+	      			<div class="list-wrapper flexbox" @click="showParagraph">
+	      				<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
+	      	  			<div class="paragraph flexbox" v-html="item.content"></div>
+	      			</div>
+	      			<div class="option-wrapper verticalbox">
+	      				<template v-if="userInfo">
+		      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId)">{{item.likes > 0 ? item.likes : ''}}</a>
+		      				<a class="option-btn iconfont icon-pinglun"></a>
+	      				</template>
+	      				<p class="option-tip" v-else>登录后可点赞或评论</p>
+	      				<span class="time flex1">{{item.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
 	      			</div>
 	      		</div>
+	      		<a class="get-more" v-if="!articlePage.nomore" @click="getMore">加载更多</a>
 	      	</div>
-
     	</div>
     	<a class="iconfont icon-fanhuidingbu goTop centerVertical" v-show="scrollTop && windowHeight && scrollTop > windowHeight/2" @click="goTop"></a>
   	</div>
@@ -66,10 +79,26 @@ export default {
   	},
   	computed: {
   		...mapGetters(['articleList']),
-  		...mapGetters(['userInfo'])
+  		...mapGetters(['userInfo']),
+  		...mapGetters(['articlePage'])
   	},
   	filters: {
-  		formatTime: Func.formatTime
+  		formatTime: Func.formatTime,
+  		isLike(arr, userInfo) {
+  			if (arr && userInfo) {
+  				if(arr.length <= 0) {
+  					return 'icon-xihuan'
+  				}
+  				return arr.map(function(item) { 
+	  				if (item === userInfo.objectId) {
+	  					return 'icon-xihuan1'
+	  				} else {
+	  					return 'icon-xihuan'
+	  				}
+				});
+  			}
+  			
+  		}
   	},
   	methods: {
   		refresh() {
@@ -106,6 +135,19 @@ export default {
   			} else {
   				this.$router.push({path: '/login'});
   			}
+  		},
+  		favorOpt(id) {
+  			let that = event.currentTarget;
+  			if (this.userInfo && that.className.indexOf('icon-xihuan1') < 0) {
+  				this.$store.dispatch('favorArticle', {id: id, objectId: this.userInfo.objectId, callback: function() {
+  					console.log(12345)
+  					that.className = 'option-btn iconfont icon-xihuan1';
+  					that.innerHTML += 1;
+  				}});
+  			}
+  		},
+  		getMore() {
+  			this.$store.dispatch('getArticleList')
   		}
   	}
 }
@@ -182,11 +224,11 @@ export default {
 .content-list{
 	width: 85%;
 	padding: 20px 30px;
-	margin: 50px auto 0;
+	margin: 0 auto 50px;
 	border: 1px solid #c4c6ca;
 	border-radius: 10px;
 	&:first-child{
-		margin-top: 0;
+		// margin-top: 30px;
 	}
 	&::before{
 	    webkit-transform: rotate(-2deg);
@@ -203,6 +245,43 @@ export default {
 	    -o-transform: rotate(1.5deg);
 	    transform: rotate(1.5deg);
 	    left: 4px;
+	}
+	.info-wrapper{
+		position: relative;
+		height: 60px;
+		padding-bottom: 10px;
+		.info-avatar{
+			width: 50px;
+			height: 50px;
+			margin-right: 10px;
+		}
+		.info-content{
+			.info-name{
+				height: 30px;
+				line-height: 30px;
+				font-size: 12px;
+				b{
+					font-size: 14px;
+				}
+			}
+			.info-sign{
+				height: 20px;
+				line-height: 14px;
+				font-size: 12px;
+			}
+		}
+		.edit-btn{
+			height: 100%;
+			font-size: 13px;
+    		&:hover{
+    			color: #666;
+    		}
+    		&::before{
+    			position: relative;
+    			top: 2px;
+    			margin-right: 5px;
+    		}
+		}
 	}
 	.list-wrapper{
 		max-height: 100px;
@@ -230,6 +309,7 @@ export default {
 		  	-webkit-line-clamp: 4;
 		  	-webkit-box-orient: vertical;
 		  	cursor: pointer;
+		  	padding: 20px 0;
 	  	}
 		&.open{
 			max-height: none;
@@ -244,25 +324,40 @@ export default {
 		}
 	}
 	.option-wrapper{
-		margin-top: 15px;
-		overflow: hidden;
+		height: 20px;
 		.option-btn{
-			font-size: 13px;
-    		margin-left: 10px;
+			font-size: 12px;
+    		margin-right: 15px;
     		&:hover{
     			color: #666;
     		}
-    		&.icon-bianji::before{
-    			margin-right: 5px;
+    		&::before{
+    			font-size: 20px;
+    			margin-right: 2px;
     		}
+		}
+		.option-tip{
+			float: left;
+			font-size: 12px;
+			color: #999;
 		}
 		.time{
 			font-size: 12px;
 			color: #999;
-			float: right;
-			margin-top: 5px;
+			text-align: right;
 	  	}
 	}
   	
+}
+.get-more{
+	display: block;
+	padding: 5px 0;
+	margin-bottom: 10px;
+	text-align: center;
+	position: relative;
+	top: -20px;
+	&:hover{
+		color: #666;
+	}
 }
 </style>

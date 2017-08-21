@@ -19,7 +19,8 @@
 	      		<div class="login-btn-wrapper flexbox">
 	      			<a class="login-btn option-button" @click="submitOpt">{{type === '1' ? '登录' : '注册'}}</a>
 	      			<a class="option-btn login-regist-btn centerVertical" @click="changeType">{{type === '1' ? '注册' : '登录'}}</a>
-	      			<a class="option-btn forget-btn centerVertical" @click="forgetPass">忘记密码</a>
+	      			<a class="option-btn forget-btn centerVertical" @click.stop="contact">联系作者</a>
+              <div class="fee" v-show="isFee"><img src="../assets/imgs/fee.jpg"></div>
 	      		</div>
 	      	</div>
     	</div>
@@ -42,15 +43,25 @@ export default {
       			'username': '',
       			'password': '',
       			'confirmPass': ''
-      		}
+      		},
+          isFee: false
     	}
   	},
-  	created() {
-  		
+  	mounted() {
+      let that = this;
+  		document.onclick = function() {
+        that.isFee = false;
+      };
+      document.onkeydown = function(event) {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e && e.keyCode == 13) {
+          that.submitOpt();
+        }
+      };
   	},
   	watch: {
 	    '$route': 'initData'
-	},
+	  },
   	methods: {
   		initData() {
   			this.type = '1';
@@ -63,12 +74,14 @@ export default {
       			'password': '',
       			'confirmPass': ''
   			};
+        this.isFee = false;
   		},
   		changeType() {
   			this.type === '1' ? this.type = '2' : this.type = '1';
   		},
-  		forgetPass() {
-  			Func.toast('忘就忘了呗');
+  		contact() {
+  			let bol = this.isFee;
+        this.isFee = !bol;
   		},
   		judgePass() {
   			let passReg = /^[a-z0-9]+$/g;
@@ -181,6 +194,7 @@ export default {
 				}
 			}
 			.login-btn-wrapper{
+        position: relative;
 				height: 13%;
 				font-size: 13px;
 				.login-btn{
@@ -198,6 +212,28 @@ export default {
 						width: 40%;
 					}
 				}
+        .fee{
+          position: absolute;
+          right: -55px;
+          bottom: 30px;
+          width: 200px;
+          &:after{
+            content: " ";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #bbb;
+            bottom: 2px;
+            background: none;
+            left: 50%;
+            margin-left: -7px;
+          }
+          img{
+            width: 100%;
+          }
+        }
 			}
 		}
 	}

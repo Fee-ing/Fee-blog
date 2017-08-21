@@ -23,6 +23,7 @@ export default {
   z-index: 10;
   width: 100%;
   height: 100%;
+  min-width: 800px;
   color: #333;
   font-size: 15px;
   overflow: hidden;
@@ -32,6 +33,7 @@ export default {
     .edit-heading{
       position: fixed;
       width: 100%;
+      min-width: 800px;
       height: 50px;
       line-height: 50px;
       text-align: center;
@@ -46,7 +48,6 @@ export default {
     .editor-content{
       position: relative;
       width: 800px;
-      min-width: 800px;
       height: 100%;
       overflow: hidden;
       margin: 0 auto;

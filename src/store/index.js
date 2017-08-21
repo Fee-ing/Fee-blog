@@ -13,14 +13,20 @@ const store = new Vuex.Store({
   state: {
     userInfo: userInfo ? JSON.parse(userInfo) : null,
     articleList: [],
-    article: {}
+    article: {},
+    articlePage: {
+      limit: 30,
+      skip: 0,
+      nomore: false
+    }
   },
   mutations,
   actions,
   getters: {
     userInfo: state=>state.userInfo,
     articleList: state=>state.articleList,
-    article: state=>state.article
+    article: state=>state.article,
+    articlePage: state=>state.articlePage
   },
   modules: {
   	// lists

@@ -13,6 +13,8 @@ const router = new VueRouter({
     path:'/article',component:require('../views/article')
   },{
     path:'/',redirect:'/home'
+  },{
+    path:'*',redirect:'/home'
   }]
 })
 
