@@ -34,7 +34,7 @@
 	      			</div>
 	      			<div class="list-wrapper flexbox" @click="showParagraph">
 	      				<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
-	      	  			<div class="paragraph flexbox" v-html="item.content"></div>
+	      	  			<div class="paragraph" v-html="item.content"></div>
 	      			</div>
 	      			<div class="option-wrapper verticalbox">
 	      				<template v-if="userInfo">
@@ -250,6 +250,7 @@ export default {
 		position: relative;
 		height: 60px;
 		padding-bottom: 10px;
+		margin-bottom: 20px;
 		.info-avatar{
 			width: 50px;
 			height: 50px;
@@ -297,6 +298,7 @@ export default {
 			border-radius: 3px;
 		}
 		.paragraph{
+			display: -webkit-box;
 			-webkit-box-flex: 1;
 		    -moz-box-flex: 1;             
 		    -webkit-flex: 1;    
@@ -309,7 +311,6 @@ export default {
 		  	-webkit-line-clamp: 4;
 		  	-webkit-box-orient: vertical;
 		  	cursor: pointer;
-		  	padding: 20px 0;
 	  	}
 		&.open{
 			max-height: none;
@@ -325,6 +326,7 @@ export default {
 	}
 	.option-wrapper{
 		height: 20px;
+		margin-top: 20px;
 		.option-btn{
 			font-size: 12px;
     		margin-right: 15px;
