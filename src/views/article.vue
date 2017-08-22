@@ -103,11 +103,7 @@ export default {
           type: this.type, 
           pic: picSrc, 
           content: this.contentWrapper.innerHTML,
-          userid: this.userInfo.objectId,
-          nickname: this.userInfo.nickname,
-          avatar: this.userInfo.avatar,
-          location: this.userInfo.location,
-          sign: this.userInfo.sign
+          userid: this.userInfo.objectId
         };
         if (this.$route.query.id) {
           option.id = this.$route.query.id;

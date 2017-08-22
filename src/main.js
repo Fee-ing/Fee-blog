@@ -7,6 +7,9 @@ import VueResource from 'vue-resource'
 import './assets/css/reset.css'
 import './assets/css/iconfont.css'
 import './assets/css/common.css'
+import './assets/css/pace-theme-minimal.css'
+
+import './assets/js/pace.min.js'
 
 Vue.use(VueResource)
 

@@ -102,9 +102,7 @@ export default {
   			let that = this;
 	      	lrz(event.currentTarget.files[0])
             	.then(function (rst) {
-
              		that.userInfo.avatar = rst.base64;
-             		console.log(that.userInfo)
 	            })
 	            .catch(function (err) {
 	              	Func.toast('图片上传失败');

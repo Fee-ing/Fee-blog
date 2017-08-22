@@ -150,15 +150,16 @@ export default {
 					return;
 	  			}
 	  			if (this.regist.confirmPass.length < 6) {
-					Func.toast('密码长度至少为6位');
-					return;
-				}
+  					Func.toast('密码长度至少为6位');
+  					return;
+  				}
   				if (this.regist.password !== this.regist.confirmPass) {
 	  				Func.toast('请确认密码是否输入正确');
 					return;
 	  			}
 	  			params.username = this.regist.username;
   				params.password = MD5(this.regist.password);
+          params.nickname = '游客' + MD5(params.username).substr(0, 6);
 	  			this.$store.dispatch('regist', params);
   			}
   		}

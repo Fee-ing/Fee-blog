@@ -22,13 +22,13 @@
   		</div>
     	<div class="editor-content">
 	      	<div id="content-wrapper" class="content-wrapper">
-	      		<div class="content-list" v-for="item in articleList">
+	      		<div class="content-list" v-for="(item, index) in articleList" v-if="item.user">
 	      			<div class="info-wrapper flexbox border-bottom">
-	      				<div class="avatar info-avatar" v-if="item.avatar" :style="{ backgroundImage: 'url(' + item.avatar + ')'}"></div>
+	      				<div class="avatar info-avatar" v-if="item.user.avatar" :style="{ backgroundImage: 'url(' + item.user.avatar + ')'}"></div>
 	      				<div class="avatar info-avatar avatar.avatar-default" v-else></div>
 	      				<div class="info-content flex1">
-	      					<div class="info-name"><b>{{item.nickname ? item.nickname : '黑户'}}</b>&nbsp;&nbsp;{{item.location ? '('+item.location+')' : ''}}</div>
-	      					<div class="info-sign">{{item.sign ? item.sign : '这人很懒，什么都没留下'}}</div>
+	      					<div class="info-name"><b>{{item.user.nickname}}</b>&nbsp;&nbsp;{{item.user.location ? '('+item.user.location+')' : ''}}</div>
+	      					<div class="info-sign">{{item.user.sign ? item.user.sign : '这人很懒，什么都没留下'}}</div>
 	      				</div>
 	      				<router-link class="edit-btn verticalbox iconfont icon-bianji" v-if="userInfo && item.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.objectId} }">编辑</router-link>  
 	      			</div>
@@ -37,12 +37,30 @@
 	      	  			<div class="paragraph" v-html="item.content"></div>
 	      			</div>
 	      			<div class="option-wrapper verticalbox">
-	      				<template v-if="userInfo">
-		      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId)">{{item.likes > 0 ? item.likes : ''}}</a>
-		      				<a class="option-btn iconfont icon-pinglun"></a>
-	      				</template>
-	      				<p class="option-tip" v-else>登录后可点赞或评论</p>
+	      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId, index)">{{item.likes > 0 ? item.likes : ''}}</a>
+	      				<a class="option-btn iconfont icon-pinglun" @click="showComment(index)">{{item.comments.length > 0 ? item.comments.length : ''}}</a>
 	      				<span class="time flex1">{{item.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
+	      			</div>
+	      			<div class="comment-wrapper">
+	      				<div class="comment-list-wrapper">
+							<template v-if="item.comments.length > 0">
+		      					<div class="comment-list" v-for="i in item.comments">
+			      					<div class="comment-info verticalbox">
+			      						<template v-if="i.nickname && i.avatar">
+			      							<div class="comment-avatar avatar" :style="{ backgroundImage: 'url(' + i.avatar + ')'}"></div>
+				      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === i.userid">{{i.nickname}}（作者）：</span>
+				      						<span class="comment-name flex1" v-else>{{i.nickname}}：</span>
+			      						</template>
+			      						<span class="comment-time">{{i.time | formatTime}}</span></div>
+			      					<p class="comment-content">{{i.comment}}</p>
+			      				</div>
+		      				</template>
+		      				<p class="noCommentTip" v-else>暂无评论</p>
+	      				</div>
+	      				<div class="comment-input-wrapper flexbox">
+	      					<input type="text" class="comment-input flex1" placeholder="不超过140字" maxlength="140">
+	      					<a class="comment-btn option-button" @click="commenSubmit(item.objectId, index)">评论</a>
+	      				</div>
 	      			</div>
 	      		</div>
 	      		<a class="get-more" v-if="!articlePage.nomore" @click="getMore">加载更多</a>
@@ -70,18 +88,21 @@ export default {
   		if (this.userInfo) {
   			this.$store.dispatch('getUser', {id: this.userInfo.objectId, sessionToken: this.userInfo.sessionToken});
   		}
-  		
   	},
   	mounted() {
   		this.contentWrapper = document.getElementById('content-wrapper');
   		this.windowHeight = document.body.clientHeight || document.documentElement.clientHeight;
   		this.contentWrapper.addEventListener('scroll', this.scrollOpt);
+
   	},
   	computed: {
   		...mapGetters(['articleList']),
   		...mapGetters(['userInfo']),
   		...mapGetters(['articlePage'])
   	},
+  	watch: {
+	    '$route': 'initHome'
+	},
   	filters: {
   		formatTime: Func.formatTime,
   		isLike(arr, userInfo) {
@@ -96,13 +117,20 @@ export default {
 	  					return 'icon-xihuan'
 	  				}
 				});
+  			} else {
+  				return 'icon-xihuan'
   			}
-  			
   		}
   	},
   	methods: {
   		refresh() {
   			this.$store.dispatch('getArticleList')
+  		},
+  		initHome() {			
+			let contentList = document.querySelectorAll('.content-list');			
+  			for (let i = 0, len = contentList.length;i < len;i ++) {
+  				contentList[i].className = 'content-list';
+  			}
   		},
   		showUser() {
   			let bol = !this.isShowUser;
@@ -136,14 +164,52 @@ export default {
   				this.$router.push({path: '/login'});
   			}
   		},
-  		favorOpt(id) {
+  		favorOpt(id, index) {
   			let that = event.currentTarget;
+  			if (!this.userInfo) {
+  				Func.toast('请先登录');
+  				return
+  			}
   			if (this.userInfo && that.className.indexOf('icon-xihuan1') < 0) {
-  				this.$store.dispatch('favorArticle', {id: id, objectId: this.userInfo.objectId, callback: function() {
-  					console.log(12345)
+  				this.$store.dispatch('favorArticle', {id: id, userid: this.userInfo.objectId, index: index, callback: function() {
   					that.className = 'option-btn iconfont icon-xihuan1';
   					that.innerHTML += 1;
   				}});
+  			}
+  		},
+  		commenSubmit(id, index) {
+  			let that = event.currentTarget;
+  			if (!this.userInfo) {
+  				Func.toast('请先登录');
+  				return
+  			}
+  			let comment = that.parentNode.querySelector('.comment-input').value;
+  			if (comment.replace(/\s+/g, "") === '') {
+  				Func.toast('评论不能为空');
+  			}
+  			let option = {
+  				data: {
+  					time: new Date(),
+	  				comment: comment.replace(/(^\s+)|(\s+$)/g,""),
+	  				id: id,
+	  				userid: this.userInfo.objectId
+  				},
+  				nickname: this.userInfo.nickname,
+  				avatar: this.userInfo.avatar || '',  				
+  				index: index,
+  				callback: function() {
+  					that.parentNode.querySelector('.comment-input').value = '';
+  				}
+  			}
+  			this.$store.dispatch('commentArticle', option);
+  		},
+  		showComment(index) {
+  			let parent = event.currentTarget.parentNode.parentNode;
+  			if (parent.className.indexOf('content-list-comment') < 0) {
+  				parent.className = 'content-list content-list-comment';
+  				this.$store.dispatch('getCommentUsers', index);
+  			} else {
+  				parent.className = 'content-list';
   			}
   		},
   		getMore() {
@@ -227,9 +293,6 @@ export default {
 	margin: 0 auto 50px;
 	border: 1px solid #c4c6ca;
 	border-radius: 10px;
-	&:first-child{
-		// margin-top: 30px;
-	}
 	&::before{
 	    webkit-transform: rotate(-2deg);
 	    -moz-transform: rotate(-2deg);
@@ -245,6 +308,11 @@ export default {
 	    -o-transform: rotate(1.5deg);
 	    transform: rotate(1.5deg);
 	    left: 4px;
+	}
+	&.content-list-comment{
+		.comment-wrapper{
+			display: block;
+		}
 	}
 	.info-wrapper{
 		position: relative;
@@ -298,6 +366,7 @@ export default {
 			border-radius: 3px;
 		}
 		.paragraph{
+			height: 80px;
 			display: -webkit-box;
 			-webkit-box-flex: 1;
 		    -moz-box-flex: 1;             
@@ -319,6 +388,7 @@ export default {
 			}
 			.paragraph{
 				display: block;
+				height: auto;
 				text-overflow: clip;
 				-webkit-line-clamp: unset;
 			}
@@ -349,7 +419,67 @@ export default {
 			text-align: right;
 	  	}
 	}
-  	
+  	.comment-wrapper{
+  		display: none;
+  		margin: 30px 0 10px;
+  		padding: 15px 10px;
+  		border: 1px solid #ccc;
+  		border-radius: 5px;
+  		.comment-list-wrapper{
+  			max-height: 400px;
+  			overflow-y: auto;
+  		}
+  		.noCommentTip{
+  			font-size: 13px;
+  			padding: 0 5px;
+  		}
+  		.comment-list{
+  			margin-top: 10px;
+  			&:first-child{
+  				margin-top: 0;
+  			}
+  			.comment-info{
+  				height: 30px;
+  				line-height: 30px;
+  				overflow: hidden;
+  				position: relative;
+  				.comment-avatar{
+  					width: 30px;
+					height: 30px;
+					display: inline-block;
+					margin-right: 5px;
+  				}
+  				.comment-name{
+					font-size: 13px;
+					font-weight: bold;
+  				}
+  				.comment-time{
+  					width: 120px;
+					font-size: 12px;
+					color: #999;
+  				}
+  			}
+  			.comment-content{
+				font-size: 13px;
+				padding: 10px 20px 5px;
+  			}
+  		}
+  		.comment-input-wrapper{
+  			height: 50px;
+  			margin-top: 30px;
+  			.comment-input{
+				margin-right: 10px;
+				border: 1px solid #999;
+				outline: none;
+				border-radius: 5px;
+				padding: 10px;
+  			}
+  			.comment-btn{
+				width: 60px;
+				height: 100%;
+  			}
+  		}
+  	}
 }
 .get-more{
 	display: block;
