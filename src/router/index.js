@@ -12,6 +12,10 @@ const router = new VueRouter({
   },{
     path:'/article',component:require('../views/article')
   },{
+    path:'/user',component:require('../views/user')
+  },{
+    path:'/tip',component:require('../views/tip')
+  },{
     path:'/',redirect:'/home'
   },{
     path:'*',redirect:'/home'

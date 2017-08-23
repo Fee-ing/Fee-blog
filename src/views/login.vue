@@ -30,13 +30,14 @@
 <script>
 import MD5 from 'blueimp-md5';
 import Func from '../assets/js/common.js'
+let phone = Func.getStorage('FeeList_phone') || ''
 
 export default {
   	data(){
     	return {
       		type: '1',
       		login: {
-      			'username': '',
+      			'username': phone,
       			'password': ''
       		},
       		regist: {
@@ -162,6 +163,7 @@ export default {
           params.nickname = '游客' + MD5(params.username).substr(0, 6);
 	  			this.$store.dispatch('regist', params);
   			}
+        Func.setStorage('FeeList_phone', (this.login.username || this.regist.username));
   		}
   	}
 }

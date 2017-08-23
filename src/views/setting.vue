@@ -4,7 +4,7 @@
   			<router-link class="iconfont icon-fanhui heading-button back-button" to="/">返回</router-link>
   		</div>
     	<div class="editor-content">
-	      	<ul class="setting-wrapper">
+	      	<ul class="setting-wrapper" v-if="userInfo">
 	      		<li class="setting-item verticalbox">
 	      			<span class="setting-item-title">头像：</span>
 	      			<div class="setting-item-wrapper verticalbox">
@@ -36,10 +36,10 @@
 	      			<div class="setting-item-wrapper verticalbox">
 	      				<p v-if="type === '1'">{{userInfo.sex ? userInfo.sex : '未设置'}}</p>
 	      				<div class="sex-rapper" v-else-if="type === '2'">
-	      					<input type="radio" name="sex" value="男" v-model="userInfo.sex">
-	      					<label>男</label>
-	      					<input type="radio" name="sex" value="女" v-model="userInfo.sex">
-	      					<label>女</label>
+	      					<input type="radio" name="sex" value="绅士" v-model="userInfo.sex">
+	      					<label>绅士</label>
+	      					<input type="radio" name="sex" value="淑女" v-model="userInfo.sex">
+	      					<label>淑女</label>
 	      				</div>
 	      			</div>
 	      		</li>
@@ -85,7 +85,9 @@ export default {
     	}
   	},
   	created() {
-  		
+  		if (!this.userInfo) {
+  			this.$router.replace({path: '/'});
+  		}
   	},
   	computed: {
   		...mapGetters(['userInfo'])
@@ -95,6 +97,10 @@ export default {
 	},
   	methods: {
   		initData() {
+  			if (!this.userInfo) {
+	  			Func.toast('请登录');
+	  			return;
+	  		}
   			this.type = '1';
   			this.$store.dispatch('getUser', {id: this.userInfo.objectId, sessionToken: this.userInfo.sessionToken});
   		},
@@ -112,6 +118,11 @@ export default {
   			this.type = '1';
   		},
   		editSaveOpt() {
+  			if (!this.userInfo) {
+	  			this.$router.push({path: '/login'});
+	  			Func.toast('请重新登录');
+	  			return;
+	  		}
   			let that = this;
   			let userInfo = this.userInfo;
   			let emailReg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/g;

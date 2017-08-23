@@ -21,6 +21,12 @@ export default {
   components: {
     editHeader
   },
+  created() {
+    if (!this.userInfo) {
+      this.$router.replace({path: '/'});
+      Func.toast('请登录');
+    }
+  },
   mounted() {
     this.contentWrapper = document.getElementById('content-wrapper');
     this.fetchData();
@@ -97,6 +103,11 @@ export default {
       }
     },
     submitArticleOpt() {
+      if (!this.userInfo) {
+        this.$router.push({path: '/login'});
+        Func.toast('请重新登录');
+        return;
+      }
       if (this.contentWrapper.innerHTML) {
         let picSrc = this.getPicSrc(this.contentWrapper.innerHTML);
         let option = {

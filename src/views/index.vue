@@ -8,7 +8,7 @@
 	  				<span class="name">{{userInfo.nickname ? userInfo.nickname : userInfo.username}}</span>
 	  			</a>
 	  			<ul class="user-wrapper" v-show="userInfo && isShowUser">
-	  				<!-- <li class="user-item"><a class="user-item-btn">我的主页</a></li> -->
+	  				<li class="user-item"><router-link class="user-item-btn" to="/user">我的主页</router-link></li>
 	  				<li class="user-item"><router-link class="user-item-btn" to="/setting">个人资料</router-link></li>
 	  				<li class="user-item"><a class="user-item-btn" @click="logoutOpt">退出登录</a></li>
 	  			</ul>
@@ -22,13 +22,13 @@
   		</div>
     	<div class="editor-content">
 	      	<div id="content-wrapper" class="content-wrapper">
-	      		<div class="content-list" v-for="(item, index) in articleList" v-if="item.user">
+	      		<div class="content-list" v-for="(item, index) in homeArticle.articles" v-if="item.user">
 	      			<div class="info-wrapper flexbox border-bottom">
 	      				<div class="avatar info-avatar" v-if="item.user.avatar" :style="{ backgroundImage: 'url(' + item.user.avatar + ')'}"></div>
 	      				<div class="avatar info-avatar avatar.avatar-default" v-else></div>
 	      				<div class="info-content flex1">
 	      					<div class="info-name"><b>{{item.user.nickname}}</b>&nbsp;&nbsp;{{item.user.location ? '('+item.user.location+')' : ''}}</div>
-	      					<div class="info-sign">{{item.user.sign ? item.user.sign : '这人很懒，什么都没留下'}}</div>
+	      					<div class="info-sign">{{item.user.sign ? item.user.sign : '无'}}</div>
 	      				</div>
 	      				<router-link class="edit-btn verticalbox iconfont icon-bianji" v-if="userInfo && item.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.objectId} }">编辑</router-link>  
 	      			</div>
@@ -39,7 +39,7 @@
 	      			<div class="option-wrapper verticalbox">
 	      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId, index)">{{item.likes > 0 ? item.likes : ''}}</a>
 	      				<a class="option-btn iconfont icon-pinglun" @click="showComment(index)">{{item.comments.length > 0 ? item.comments.length : ''}}</a>
-	      				<span class="time flex1">{{item.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
+	      				<span class="time flex1">{{item.type === '1' ? '发布于' : '更新于'}} {{item.createdAt | formatTime}}</span>
 	      			</div>
 	      			<div class="comment-wrapper">
 	      				<div class="comment-list-wrapper">
@@ -63,10 +63,10 @@
 	      				</div>
 	      			</div>
 	      		</div>
-	      		<a class="get-more" v-if="!articlePage.nomore" @click="getMore">加载更多</a>
+	      		<a class="get-more" v-if="!homeArticle.nomore" @click="getMore">加载更多</a>
 	      	</div>
     	</div>
-    	<a class="iconfont icon-fanhuidingbu goTop centerVertical" v-show="scrollTop && windowHeight && scrollTop > windowHeight/2" @click="goTop"></a>
+    	<a class="iconfont icon-fanhuidingbu go-top centerVertical" v-show="scrollTop && windowHeight && scrollTop > windowHeight/2" @click="goTop"></a>
   	</div>
 </template>
 
@@ -93,12 +93,10 @@ export default {
   		this.contentWrapper = document.getElementById('content-wrapper');
   		this.windowHeight = document.body.clientHeight || document.documentElement.clientHeight;
   		this.contentWrapper.addEventListener('scroll', this.scrollOpt);
-
   	},
   	computed: {
-  		...mapGetters(['articleList']),
-  		...mapGetters(['userInfo']),
-  		...mapGetters(['articlePage'])
+  		...mapGetters(['homeArticle']),
+  		...mapGetters(['userInfo'])
   	},
   	watch: {
 	    '$route': 'initHome'
@@ -124,7 +122,7 @@ export default {
   	},
   	methods: {
   		refresh() {
-  			this.$store.dispatch('getArticleList')
+  			this.$store.dispatch('getArticleList', {refresh: true})
   		},
   		initHome() {			
 			let contentList = document.querySelectorAll('.content-list');			
@@ -161,7 +159,7 @@ export default {
   			if (this.userInfo) {
   				this.$router.push({path: '/article'});
   			} else {
-  				this.$router.push({path: '/login'});
+  				Func.toast('请先登录');
   			}
   		},
   		favorOpt(id, index) {
@@ -207,7 +205,7 @@ export default {
   			let parent = event.currentTarget.parentNode.parentNode;
   			if (parent.className.indexOf('content-list-comment') < 0) {
   				parent.className = 'content-list content-list-comment';
-  				this.$store.dispatch('getCommentUsers', index);
+  				this.$store.dispatch('getCommentUsers', {index: index});
   			} else {
   				parent.className = 'content-list';
   			}
@@ -219,7 +217,7 @@ export default {
 }
 </script>
  
-<style lang="less" scoped>
+<style lang="less">
 .edit-heading-title{
 	display: inline-block;
 	height: 100%;
@@ -270,22 +268,6 @@ export default {
 }
 .add-button{
 	right: 30px;
-}
-.goTop{
-	position: fixed;
-	right: 50px;
-	bottom: 100px;
-	z-index: 100;
-	width: 50px;
-	height: 50px;
-	background-color: #555;
-	border-radius: 50%;
-	&::before{
-		color: #fff;
-	}
-	&:hover{
-		background-color: #666;
-	}
 }
 .content-list{
 	width: 85%;
@@ -457,6 +439,7 @@ export default {
   					width: 120px;
 					font-size: 12px;
 					color: #999;
+					text-align: right;
   				}
   			}
   			.comment-content{
@@ -480,16 +463,5 @@ export default {
   			}
   		}
   	}
-}
-.get-more{
-	display: block;
-	padding: 5px 0;
-	margin-bottom: 10px;
-	text-align: center;
-	position: relative;
-	top: -20px;
-	&:hover{
-		color: #666;
-	}
 }
 </style>

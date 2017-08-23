@@ -54,6 +54,12 @@ export default {
       background-color: #fff;
       padding-top: 50px;
       box-shadow: 0 0 10px rgba(0,0,0,0.25);
+      &.editor-content-user{
+        overflow-y: auto;
+        .content-wrapper{
+          height: auto;
+        }
+      }
       .content-wrapper{
         height: 100%;
         padding: 50px 50px 0px;

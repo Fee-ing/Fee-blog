@@ -20,113 +20,48 @@ const OPTIONS = {
 
 const actions = {
 	getArticleList({commit, state}, option) {
+		let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
+		OPTIONS1.params = {order: '-createdAt', limit: state.homeArticle.limit, skip: skip};
+		OPTIONS1.emulateJSON = true;
+
+		let name = option && option.name ? option.name : 'homeArticle';
 		let isback = option && option.isback ? true : false;
 		let refresh = option && option.refresh ? true : false;
-		let skip = (isback || refresh) ? 0 : state.articlePage.skip;
-		let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-		OPTIONS1.params = {order: '-createdAt', limit: state.articlePage.limit, skip: skip};
-		OPTIONS1.emulateJSON = true;
+		let skip = (isback || refresh) ? 0 : state[name].skip;
+
+		if (name === 'userArticles') {
+			OPTIONS1.params.where = {userid: option.userid};
+		} else if(name === 'userFavorArticles') {
+			OPTIONS1.params.where = {'likeUsers': {'$in': [option.userid]}};
+		} else if(name === 'userCommentArticles') {
+			OPTIONS1.params.where = {'commentUsers': {'$in': [option.userid]}};
+		}
+		
 		Vue.http.get(BASEDATA.baseUrl, OPTIONS1)
 	        .then((response) => { 
 	        	let results = response.data.results;
-	        	let isNomore = results.length < state.articlePage.limit ? true : false;
-		    	commit('setArticleList', {results: results, skip: skip + results.length, nomore: isNomore, isback: (isback || refresh)});
-		    	if (isback) {
-		    		router.go(-1);
-		    	} 
+	        	let isNomore = results.length < state.homeArticle.limit ? true : false;
+		    	commit('setArticleList', {results: results, skip: skip + results.length, nomore: isNomore, refresh: (isback || refresh), name: name});
 
 		    	//获取每篇文章的用户信息
 		    	for (let i = 0, len = results.length;i < len;i ++) {
-		    		Vue.http.get(BASEDATA.userUrl+'/'+results[i].userid, OPTIONS)		//获取用户信息
+		    		Vue.http.get(BASEDATA.userUrl+'/'+results[i].userid, OPTIONS)		
 				        .then((response) => {
 				        	let data = {
 				        		data: response.data,
-				        		index: i
+				        		index: i,
+				        		name: name
 				        	}
 				        	commit('setArticleUser', data);
 				        })
 		    	}
 
+		    	if (isback) {
+		    		router.go(-1);
+		    	} 
 	        })
 	        .catch((response) => {
 	          	Func.toast('文章用户信息更新失败');
-	        })
-    },
-    login({dispatch, commit}, params) {
-    	Vue.http.post(BASEDATA.loginUrl, params, OPTIONS)
-	        .then((response) => {
-	        	commit('saveUserInfo', response.data);
-	        	Func.setCookie('Fee_userInfo', JSON.stringify(response.data));
-	        	dispatch('getArticleList', {isback: true});
-	    		Func.toast('登录成功');
-	        })
-	        .catch((response) => {
-	          	Func.toast(TIP[response.data.code]);
-	        })
-    },
-    regist({dispatch}, params) {
-    	Vue.http.post(BASEDATA.userUrl, params, OPTIONS)
-	        .then((response) => {
-	        	dispatch('login', params);
-	        })
-	        .catch((response) => {
-	          	Func.toast(TIP[response.data.code]);
-	        })
-    },
-    logout({dispatch, commit}) {
-    	commit('saveUserInfo', null);
-    	Func.delCookie('Fee_userInfo');
-    	dispatch('getArticleList');
-		Func.toast('退出登录');
-    },
-    getUser({commit}, option) {
-    	Vue.http.get(BASEDATA.userUrl+'/'+option.id, OPTIONS)		//获取用户信息
-	        .then((response) => {
-	        	response.data.sessionToken = option.sessionToken;
-	        	commit('saveUserInfo', response.data);
-	        	Func.setCookie('Fee_userInfo', JSON.stringify(response.data));
-	        })
-	        .catch((response) => {
-	          	Func.toast('获取用户信息失败')
-	        })
-    },
-    updateUser({dispatch, commit}, option) {
-    	let headers = JSON.parse(JSON.stringify(OPTIONS.headers));
-    	headers['X-LC-Session'] = option.sessionToken;
-    	Vue.http.put(BASEDATA.userUrl+'/'+option.id, option.userInfo, { headers })
-	        .then((response) => {
-	        	option.callback();
-	    		Func.toast('保存成功');
-	 			dispatch('getUser', {id: option.id, sessionToken: option.sessionToken});
-	 			dispatch('getArticleList',  {refresh: true});
-	 			// let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-	 			// OPTIONS1.params = {where: {userid: option.id}};
-	 			// OPTIONS1.emulateJSON = true;
-	 			// //查询此用户已发布的所有文章
-	 			// Vue.http.get(BASEDATA.baseUrl, OPTIONS1)
-			  //       .then((response) => {
-			  //       	//更新此用户文章的用户信息
-			  //       	for (let i = 0; i <= response.data.results.length; i++) {
-			  //       		let id = response.data.results[i].objectId;
-				 //        	let data = {
-				 //        		'nickname': option.userInfo.nickname,
-					// 			'avatar': option.userInfo.avatar,
-					// 			'location': option.userInfo.location,
-					// 			'sign': option.userInfo.sign
-				 //        	};
-				 //        	Vue.http.put(BASEDATA.baseUrl+'/'+id, data, OPTIONS)
-					// 	        .then((response) => {
-					// 	        	dispatch('getArticleList');
-					// 	        })
-			  //       	}
-			        	
-			  //       })
-			  //       .catch((response) => {
-			  //         	Func.toast('文章用户信息更新失败');
-			  //       })
-	        })
-	        .catch((response) => {
-	          	Func.toast('保存失败');
 	        })
     },
     submitArticle({dispatch}, article) {
@@ -184,11 +119,13 @@ const actions = {
 	          	Func.toast('删除失败');
 	        })
     },
-    favorArticle({dispatch}, option) {
+    favorArticle({dispatch, commit}, option) {
     	let data = {
     		"likes": {"__op":"Increment", "amount":1},
     		"likeUsers": {"__op":"Add", "objects": [option.userid]}
     	};
+    	let name = option && option.name ? option.name : 'homeArticle';
+
     	Vue.http.put(BASEDATA.baseUrl+'/'+option.id, data, OPTIONS)
 	        .then((response) => {
 	    		let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
@@ -197,8 +134,13 @@ const actions = {
 				Vue.http.get(BASEDATA.baseUrl+'/'+option.id, OPTIONS1)
 			        .then((response) => { 
 			        	response.data.index = option.index;
+			        	response.data.name = name;
 			        	commit('updateLikes', response.data);
 			        	Func.toast('点赞成功');
+
+			        	if (name !== 'homeArticle') {
+			        		dispatch('getArticleList', {refresh: true});
+			        	}
 			        })
 			        .catch((response) => {
 			          	if (option.callback) {
@@ -210,29 +152,13 @@ const actions = {
 	          	Func.toast('点赞失败');
 	        })
     },
-    getCommentUsers({commit, state}, index) {
-    	// //获取每条评论的用户信息
-    	let commentList = state.articleList[index].comments;
-    	let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-		OPTIONS1.params = {keys: 'nickname,avatar'};
-		OPTIONS1.emulateJSON = true;
-    	for (let i = 0, len = commentList.length;i < len;i ++) {
-    		Vue.http.get(BASEDATA.userUrl+'/'+commentList[i].userid, OPTIONS1)		//获取用户信息
-		        .then((response) => {
-		        	let data = {
-		        		data: response.data,
-		        		index: index,
-		        		i: i
-		        	}
-		        	commit('setCommentUser', data);
-		        })
-    	}
-    },
-    commentArticle({commit}, option) {
+    commentArticle({dispatch, commit}, option) {
     	let data = {
     		'comments': {'__op': 'Add', 'objects': [option.data]},
     		'commentUsers': {'__op': 'AddUnique', 'objects': [option.data.userid]}
     	};
+    	let name = option && option.name ? option.name : 'homeArticle';
+
     	Vue.http.put(BASEDATA.baseUrl+'/'+option.data.id, data, OPTIONS)
 	        .then((response) => {
 	    		//更新评论
@@ -242,6 +168,7 @@ const actions = {
 				Vue.http.get(BASEDATA.baseUrl+'/'+option.data.id, OPTIONS1)
 			        .then((response) => { 
 			        	response.data.index = option.index;
+			        	response.data.name = name;
 			        	commit('updateComments', response.data);
 			        	if (option.callback) {
 			        		option.callback();
@@ -259,11 +186,16 @@ const actions = {
 						        	let data = {
 						        		data: response.data,
 						        		index: option.index,
-						        		i: i
+						        		i: i,
+						        		name: name
 						        	}
 						        	commit('setCommentUser', data);
 						        })
 				    	}
+
+				    	if (name !== 'homeArticle') {
+			        		dispatch('getArticleList', {refresh: true});
+			        	}
 			        })
 			        .catch((response) => {
 			          	Func.toast('评论更新失败');
@@ -272,7 +204,82 @@ const actions = {
 	        .catch((response) => {
 	          	Func.toast('评论失败');
 	        })
-    }
+    },
+    login({dispatch, commit}, params) {
+    	Vue.http.post(BASEDATA.loginUrl, params, OPTIONS)
+	        .then((response) => {
+	        	commit('saveUserInfo', response.data);
+	        	Func.setCookie('Fee_userInfo', JSON.stringify(response.data));
+	        	dispatch('getArticleList', {isback: true});
+	    		Func.toast('登录成功');
+	        })
+	        .catch((response) => {
+	          	Func.toast(TIP[response.data.code]);
+	        })
+    },
+    regist({dispatch}, params) {
+    	Vue.http.post(BASEDATA.userUrl, params, OPTIONS)
+	        .then((response) => {
+	        	dispatch('login', params);
+	        })
+	        .catch((response) => {
+	          	Func.toast(TIP[response.data.code]);
+	        })
+    },
+    logout({dispatch, commit}) {
+    	commit('saveUserInfo', null);
+    	Func.delCookie('Fee_userInfo');
+    	dispatch('getArticleList');
+		Func.toast('退出登录');
+    },
+    getUser({commit}, option) {
+    	Vue.http.get(BASEDATA.userUrl+'/'+option.id, OPTIONS)		//获取用户信息
+	        .then((response) => {
+	        	response.data.sessionToken = option.sessionToken;
+	        	commit('saveUserInfo', response.data);
+	        	Func.setCookie('Fee_userInfo', JSON.stringify(response.data));
+	        })
+	        .catch((response) => {
+	          	Func.toast('获取用户信息失败')
+	        })
+    },
+    updateUser({dispatch, commit}, option) {
+    	let headers = JSON.parse(JSON.stringify(OPTIONS.headers));
+    	headers['X-LC-Session'] = option.sessionToken;
+    	Vue.http.put(BASEDATA.userUrl+'/'+option.id, option.userInfo, { headers })
+	        .then((response) => {
+	        	option.callback();
+	    		Func.toast('保存成功');
+	 			dispatch('getUser', {id: option.id, sessionToken: option.sessionToken});
+	 			dispatch('getArticleList',  {refresh: true});
+	        })
+	        .catch((response) => {
+	          	Func.toast('保存失败');
+	        })
+    },
+    getCommentUsers({commit, state}, option) {
+    	let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
+		OPTIONS1.params = {keys: 'nickname,avatar'};
+		OPTIONS1.emulateJSON = true;
+
+    	// //获取每条评论的用户信息
+    	let commentList = state.homeArticle.articles[option.index].comments;
+    	let name = option && option.name ? option.name : 'homeArticle';
+    	
+    	for (let i = 0, len = commentList.length;i < len;i ++) {
+    		Vue.http.get(BASEDATA.userUrl+'/'+commentList[i].userid, OPTIONS1)		//获取用户信息
+		        .then((response) => {
+		        	let data = {
+		        		data: response.data,
+		        		index: option.index,
+		        		i: i,
+		        		name: name
+		        	}
+		        	commit('setCommentUser', data);
+		        })
+    	}
+    },
+    
 }
 
 export default actions
