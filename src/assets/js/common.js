@@ -93,7 +93,8 @@ var Func = {
   		}
   		if (_s - s > 0) {
   			return (_s - s) +'秒前';
-  		}
+  		}  
+  		return '刚刚';
 	},
 	explorerVersion: function() {
 		let explorer = window.navigator.userAgent.toLowerCase();

@@ -208,23 +208,27 @@ img{
     height: 50px;
     background-color: #555;
     border-radius: 50%;
-    &::before{
-        color: #fff;
-    }
-    &:hover{
-        background-color: #666;
-    }
+}
+.go-top::before{
+    color: #fff;
+}
+.go-top:hover{
+    background-color: #666;
 }
 .get-more{
     display: block;
     padding: 5px 0;
     margin-bottom: 10px;
     text-align: center;
+    user-select: none;
     position: relative;
     top: -20px;
-    &:hover{
-        color: #666;
-    }
+}
+.get-more:hover{
+    color: #666;
+}
+.get-more.no-more{
+    color: #ccc;
 }
 .border-bottom::after{
     content: '';

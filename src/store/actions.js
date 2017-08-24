@@ -20,11 +20,13 @@ const OPTIONS = {
 
 const actions = {
 	getArticleList({commit, state}, option) {
+		let name = option && option.name ? option.name : 'homeArticle';
+
 		let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-		OPTIONS1.params = {order: '-createdAt', limit: state.homeArticle.limit, skip: skip};
+		OPTIONS1.params = {order: '-createdAt', limit: state[name].limit, skip: skip, keys: '-comments'};
 		OPTIONS1.emulateJSON = true;
 
-		let name = option && option.name ? option.name : 'homeArticle';
+		
 		let isback = option && option.isback ? true : false;
 		let refresh = option && option.refresh ? true : false;
 		let skip = (isback || refresh) ? 0 : state[name].skip;
@@ -40,7 +42,7 @@ const actions = {
 		Vue.http.get(BASEDATA.baseUrl, OPTIONS1)
 	        .then((response) => { 
 	        	let results = response.data.results;
-	        	let isNomore = results.length < state.homeArticle.limit ? true : false;
+	        	let isNomore = results.length < state[name].limit ? true : false;
 		    	commit('setArticleList', {results: results, skip: skip + results.length, nomore: isNomore, refresh: (isback || refresh), name: name});
 
 		    	//获取每篇文章的用户信息
@@ -155,6 +157,7 @@ const actions = {
     commentArticle({dispatch, commit}, option) {
     	let data = {
     		'comments': {'__op': 'Add', 'objects': [option.data]},
+    		'commentsNumber': {"__op":"Increment", "amount": 1},
     		'commentUsers': {'__op': 'AddUnique', 'objects': [option.data.userid]}
     	};
     	let name = option && option.name ? option.name : 'homeArticle';
@@ -180,16 +183,24 @@ const actions = {
 				    	let OPTIONS2 = JSON.parse(JSON.stringify(OPTIONS));
 						OPTIONS2.params = {keys: 'nickname,avatar'};
 						OPTIONS2.emulateJSON = true;
+
+						let num = 0;
+
 				    	for (let i = 0, len = commentList.length;i < len;i ++) {
 				    		Vue.http.get(BASEDATA.userUrl+'/'+commentList[i].userid, OPTIONS2)		
 						        .then((response) => {
-						        	let data = {
-						        		data: response.data,
-						        		index: option.index,
-						        		i: i,
-						        		name: name
+						        	num ++;
+						        	commentList[i].nickname = response.data.nickname;
+						        	commentList[i].avatar = response.data.avatar;
+						        	if (num >= commentList.length) {
+						        		let data = {
+						        			index: option.index,
+						        			comments: commentList,
+						        			name: name
+						        		}
+						        		commit('setComments', data);
+						        		return;
 						        	}
-						        	commit('setCommentUser', data);
 						        })
 				    	}
 
@@ -257,27 +268,50 @@ const actions = {
 	          	Func.toast('保存失败');
 	        })
     },
-    getCommentUsers({commit, state}, option) {
+    getComments({commit, state}, option) {
+    	let name = option && option.name ? option.name : 'homeArticle';
+
     	let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-		OPTIONS1.params = {keys: 'nickname,avatar'};
+		OPTIONS1.params = {keys: 'comments,commentUsers,commentsNumber'};
 		OPTIONS1.emulateJSON = true;
 
-    	// //获取每条评论的用户信息
-    	let commentList = state.homeArticle.articles[option.index].comments;
-    	let name = option && option.name ? option.name : 'homeArticle';
-    	
-    	for (let i = 0, len = commentList.length;i < len;i ++) {
-    		Vue.http.get(BASEDATA.userUrl+'/'+commentList[i].userid, OPTIONS1)		//获取用户信息
-		        .then((response) => {
-		        	let data = {
-		        		data: response.data,
-		        		index: option.index,
-		        		i: i,
-		        		name: name
-		        	}
-		        	commit('setCommentUser', data);
-		        })
-    	}
+		Vue.http.get(BASEDATA.baseUrl+'/'+option.id, OPTIONS1)
+	        .then((response) => { 
+	        	let commentList = response.data.comments;
+	        	let commentUsers = response.data.commentUsers;
+	        	let commentsNumber = response.data.commentsNumber;
+
+	        	let OPTIONS2 = JSON.parse(JSON.stringify(OPTIONS));
+				OPTIONS2.params = {keys: 'nickname,avatar'};
+				OPTIONS2.emulateJSON = true;
+
+				let num = 0;
+
+				for (let i = 0, len = commentList.length;i < len;i ++) {
+		    		Vue.http.get(BASEDATA.userUrl+'/'+commentList[i].userid, OPTIONS2)		//获取用户信息
+				        .then((response) => {
+				        	num ++;
+				        	commentList[i].nickname = response.data.nickname;
+				        	commentList[i].avatar = response.data.avatar;
+				        	if (num >= commentList.length) {
+				        		let data = {
+				        			index: option.index,
+				        			comments: commentList,
+				        			commentUsers: commentUsers,
+				        			commentsNumber: commentsNumber,
+				        			name: name
+				        		}
+				        		commit('setComments', data);
+				        		return;
+				        	}
+				        })
+		    	}
+
+
+	        })
+	        .catch((response) => {
+	          	Func.toast('获取评论失败')
+	        })    	
     },
     
 }

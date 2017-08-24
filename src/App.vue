@@ -65,6 +65,209 @@ export default {
         padding: 50px 50px 0px;
         overflow-x: hidden;
         overflow-y: auto;
+        .content-list{
+          width: 85%;
+          padding: 20px 30px;
+          margin: 0 auto 50px;
+          border: 1px solid #c4c6ca;
+          border-radius: 10px;
+          &::before{
+              webkit-transform: rotate(-2deg);
+              -moz-transform: rotate(-2deg);
+              -ms-transform: rotate(-2deg);
+              -o-transform: rotate(-2deg);
+              transform: rotate(-2deg);
+              left: -4px;
+          }
+          &::after{
+              webkit-transform: rotate(1.5deg);
+              -moz-transform: rotate(1.5deg);
+              -ms-transform: rotate(1.5deg);
+              -o-transform: rotate(1.5deg);
+              transform: rotate(1.5deg);
+              left: 4px;
+          }
+          &.content-list-comment{
+            .comment-wrapper{
+              display: block;
+            }
+          }
+          .info-wrapper{
+            position: relative;
+            height: 60px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            .info-avatar{
+              width: 50px;
+              height: 50px;
+              margin-right: 10px;
+            }
+            .info-content{
+              .info-name{
+                height: 30px;
+                line-height: 30px;
+                font-size: 12px;
+                b{
+                  font-size: 14px;
+                }
+              }
+              .info-sign{
+                height: 20px;
+                line-height: 14px;
+                font-size: 12px;
+              }
+            }
+            .edit-btn{
+              height: 100%;
+              font-size: 13px;
+                &:hover{
+                  color: #666;
+                }
+                &::before{
+                  position: relative;
+                  top: 2px;
+                  margin-right: 5px;
+                }
+            }
+          }
+          .list-wrapper{
+            max-height: 100px;
+            overflow: hidden;
+            .first-img{
+              width: 180px;
+              height: 100px;
+              background-color: #fff;
+              background-repeat: no-repeat;
+              background-position: center;
+              background-size: cover;
+              margin-right: 15px;
+              border-radius: 3px;
+            }
+            .paragraph{
+              height: 80px;
+              display: -webkit-box;
+              -webkit-box-flex: 1;
+                -moz-box-flex: 1;             
+                -webkit-flex: 1;    
+                -ms-flex: 1;
+                flex: 1;
+              font-size: 15px;
+              letter-spacing: 2px;
+              text-overflow: -o-ellipsis-lastline;
+                text-overflow: ellipsis;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                cursor: pointer;
+              }
+            &.open{
+              max-height: none;
+              .first-img{
+                display: none;
+              }
+              .paragraph{
+                display: block;
+                height: auto;
+                text-overflow: clip;
+                -webkit-line-clamp: unset;
+              }
+            }
+          }
+          .option-wrapper{
+            height: 20px;
+            margin-top: 20px;
+            .option-btn{
+              font-size: 12px;
+                margin-right: 15px;
+                &:hover{
+                  color: #666;
+                }
+                &::before{
+                  font-size: 20px;
+                  margin-right: 2px;
+                }
+            }
+            .option-tip{
+              float: left;
+              font-size: 12px;
+              color: #999;
+            }
+            .time{
+              font-size: 12px;
+              color: #999;
+              text-align: right;
+              }
+          }
+            .comment-wrapper{
+              display: none;
+              margin: 30px 0 10px;
+              padding: 15px 10px;
+              border: 1px solid #ccc;
+              border-radius: 5px;
+              .comment-list-wrapper{
+                max-height: 400px;
+                overflow-y: auto;
+              }
+              .noCommentTip{
+                font-size: 13px;
+                padding: 0 5px;
+              }
+              .comment-header{
+                margin-bottom: 25px;
+                span{
+                  font-size: 15px;
+                  font-weight: bold;
+                  margin-left: 5px;
+                }
+              }
+              .comment-list{
+                margin-top: 10px;
+                &:first-child{
+                  margin-top: 0;
+                }
+                .comment-info{
+                  height: 30px;
+                  line-height: 30px;
+                  overflow: hidden;
+                  position: relative;
+                  .comment-avatar{
+                    width: 30px;
+                  height: 30px;
+                  display: inline-block;
+                  margin-right: 5px;
+                  }
+                  .comment-name{
+                  font-size: 13px;
+                  font-weight: bold;
+                  }
+                  .comment-time{
+                    width: 120px;
+                  font-size: 12px;
+                  color: #999;
+                  text-align: right;
+                  }
+                }
+                .comment-content{
+                font-size: 13px;
+                padding: 10px 20px 5px;
+                }
+              }
+              .comment-input-wrapper{
+                height: 50px;
+                margin-top: 30px;
+                .comment-input{
+                margin-right: 10px;
+                border: 1px solid #999;
+                outline: none;
+                border-radius: 5px;
+                padding: 10px;
+                }
+                .comment-btn{
+                width: 60px;
+                height: 100%;
+                }
+              }
+            }
+        }
       }
     }
   }

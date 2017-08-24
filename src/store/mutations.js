@@ -19,9 +19,10 @@ const mutations = {
     state[data.name].articles = [];
     state[data.name].articles = fee;
   },
-  setCommentUser(state, data) {
-    state[data.name].articles[data.index].comments[data.i].nickname = data.data.nickname;
-    state[data.name].articles[data.index].comments[data.i].avatar = data.data.avatar;
+  setComments(state, data) {
+    state[data.name].articles[data.index].comments = data.comments;
+    state[data.name].articles[data.index].commentUsers = data.commentUsers;
+    state[data.name].articles[data.index].commentsNumber = data.commentsNumber;
     let fee = state[data.name].articles;
     state[data.name].articles = [];
     state[data.name].articles = fee;

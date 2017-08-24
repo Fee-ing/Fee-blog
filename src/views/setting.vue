@@ -115,7 +115,7 @@ export default {
 	            });
   		},
   		cancelOpt() {
-  			this.type = '1';
+  			this.initData();
   		},
   		editSaveOpt() {
   			if (!this.userInfo) {

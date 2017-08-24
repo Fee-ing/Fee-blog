@@ -5,15 +5,15 @@
   			<h1 class="edit-heading-title">我的主页</h1>
   		</div>
     	<div class="editor-content editor-content-user">
-    		<div class="info-wrapper" v-if="userInfo">
-    			<div class="info-main flexbox">
-    				<div class="info-avatar avatar" v-if="userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></div>
-    				<div class="info-avatar avatar avatar-default" v-else></div>
-    				<div class="info-ex flex1 flexbox">
-    					<div class="info-ex-item">昵称：{{userInfo.nickname}}{{userInfo.sex ? '（'+userInfo.sex+'）' : ''}}<span class="location">{{userInfo.location}}</span></div>
-    					<div class="info-ex-item">帐号：{{userInfo.username}}</div>
-    					<div class="info-ex-item">邮箱：{{userInfo.email ? userInfo.email : '未填写'}}</div>
-    					<div class="info-ex-item flexbox"><span>签名：</span><div class="flex1">{{userInfo.email ? userInfo.email : '未填写'}}</div></div>
+    		<div class="userinfo-wrapper" v-if="userInfo">
+    			<div class="userinfo-main flexbox">
+    				<div class="userinfo-avatar avatar" v-if="userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></div>
+    				<div class="userinfo-avatar avatar avatar-default" v-else></div>
+    				<div class="userinfo-ex flex1 flexbox">
+    					<div class="userinfo-ex-item">昵称：{{userInfo.nickname}}{{userInfo.sex ? '（'+userInfo.sex+'）' : ''}}<span class="location">{{userInfo.location}}</span></div>
+    					<div class="userinfo-ex-item">帐号：{{userInfo.username}}</div>
+    					<div class="userinfo-ex-item">邮箱：{{userInfo.email ? userInfo.email : '未填写'}}</div>
+    					<div class="userinfo-ex-item flexbox"><span>签名：</span><div class="flex1">{{userInfo.sign ? userInfo.sign : '未填写'}}</div></div>
     				</div>
     			</div>
     		</div>
@@ -39,12 +39,13 @@
 	      			</div>
 	      			<div class="option-wrapper verticalbox">
 	      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId, index)">{{item.likes > 0 ? item.likes : ''}}</a>
-	      				<a class="option-btn iconfont icon-pinglun" @click="showComment(index)">{{item.comments.length > 0 ? item.comments.length : ''}}</a>
+	      				<a class="option-btn iconfont icon-pinglun" @click="showComment(item.objectId, index)">{{item.commentsNumber > 0 ? item.commentsNumber : ''}}</a>
 	      				<span class="time flex1">{{item.type === '1' ? '发布于' : '更新于'}}{{item.createdAt | formatTime}}</span>
 	      			</div>
 	      			<div class="comment-wrapper">
 	      				<div class="comment-list-wrapper">
-							<template v-if="item.comments.length > 0">
+							     <template v-if="item.commentsNumber > 0">
+                    <div class="comment-header"><span>留言区：</span></div>
 		      					<div class="comment-list" v-for="i in item.comments">
 			      					<div class="comment-info verticalbox">
 			      						<template v-if="i.nickname && i.avatar">
@@ -65,6 +66,7 @@
 	      			</div>
 	      		</div>
 	      		<a class="get-more" v-if="!articles.nomore" @click="getMore">加载更多</a>
+            <p class="get-more no-more" v-else>没有更多了</p>
 	      	</div>
     	</div>
     	<a class="iconfont icon-fanhuidingbu go-top centerVertical" v-show="scrollTop && windowHeight && scrollTop > windowHeight/2" @click="goTop"></a>
@@ -107,7 +109,7 @@ export default {
   	},
   	watch: {
 	    '$route': 'init'
-	},
+	  },
   	filters: {
   		formatTime: Func.formatTime,
   		isLike(arr, userInfo) {
@@ -129,7 +131,13 @@ export default {
   	},
   	methods: {
   		init() {			
-			this.name = 'userArticles';
+  		  this.name = 'userArticles';
+        if (!this.userInfo) {
+          this.$router.replace({path: '/'});
+          Func.toast('请登录');
+          return;
+        }
+        this.$store.dispatch('getUser', {id: this.userInfo.objectId, sessionToken: this.userInfo.sessionToken});
   		},
   		scrollOpt() {
   			this.scrollTop = this.contentWrapper.scrollTop;
@@ -200,11 +208,11 @@ export default {
   			}
   			this.$store.dispatch('commentArticle', option);
   		},
-  		showComment(index) {
+  		showComment(id,index) {
   			let parent = event.currentTarget.parentNode.parentNode;
   			if (parent.className.indexOf('content-list-comment') < 0) {
   				parent.className = 'content-list content-list-comment';
-  				this.$store.dispatch('getCommentUsers', {index: index, name: this.name});
+  				this.$store.dispatch('getComments', {id: id, index: index, name: this.name});
   			} else {
   				parent.className = 'content-list';
   			}
@@ -218,20 +226,20 @@ export default {
 		font-size: 16px;
 		font-weight: normal;
 	}
-	.info-wrapper{
+	.userinfo-wrapper{
 		padding: 30px;
-		.info-main{
-			.info-avatar{
+		.userinfo-main{
+			.userinfo-avatar{
 				width: 200px;
 				height: 200px;
 			}
-			.info-ex{
+			.userinfo-ex{
 				padding: 30px 0px 10px 30px;
 				-moz-box-flex-wrap: wrap;
 				-webkit-flex-wrap: wrap;
 				-ms-flex-wrap: wrap;
 				flex-wrap: wrap;
-				.info-ex-item{
+				.userinfo-ex-item{
 					height: 25%;
 					width: 50%;
 					-webkit-box-flex: none;
