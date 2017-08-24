@@ -49,8 +49,9 @@
 			      					<div class="comment-info verticalbox">
 		      							<div class="comment-avatar avatar" v-if="i.avatar" :style="{ backgroundImage: 'url(' + i.avatar + ')'}"></div>
 		      							<div class="comment-avatar avatar avatar-default" v-else></div>
-			      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === item.objectId">{{i.nickname}}（作者）：</span>
-			      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === i.userid">我：</span>
+		      							<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === i.userid && i.userid === item.userid">我（作者）：</span>
+			      						<span class="comment-name flex1" v-else-if="i.userid === item.userid">{{i.nickname}}（作者）：</span>
+			      						<span class="comment-name flex1" v-else-if="userInfo && userInfo.objectId === i.userid">我：</span>
 			      						<span class="comment-name flex1" v-else>{{i.nickname}}：</span>
 			      						<span class="comment-time">{{i.time | formatTime}}</span></div>
 			      					<p class="comment-content">{{i.comment}}</p>

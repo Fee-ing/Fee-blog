@@ -129,6 +129,7 @@ export default {
   				params.username = this.login.username;
   				params.password = MD5(this.login.password);
   				this.$store.dispatch('login', params);
+          Func.setStorage('FeeList_phone', this.login.username);
   			} else {
   				if (!phoneReg.test(this.regist.username)) {
   					Func.toast('请输入正确的手机号');
@@ -162,8 +163,8 @@ export default {
   				params.password = MD5(this.regist.password);
           params.nickname = '游客' + MD5(params.username).substr(0, 6);
 	  			this.$store.dispatch('regist', params);
+          Func.setStorage('FeeList_phone', this.regist.username);
   			}
-        Func.setStorage('FeeList_phone', (this.login.username || this.regist.username));
   		}
   	}
 }
