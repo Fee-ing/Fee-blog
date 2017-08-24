@@ -47,11 +47,11 @@
 								<div class="comment-header"><span>留言区：</span></div>
 		      					<div class="comment-list" v-for="i in item.comments">
 			      					<div class="comment-info verticalbox">
-			      						<template v-if="i.nickname && i.avatar">
-			      							<div class="comment-avatar avatar" :style="{ backgroundImage: 'url(' + i.avatar + ')'}"></div>
-				      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === i.userid">{{i.nickname}}（作者）：</span>
-				      						<span class="comment-name flex1" v-else>{{i.nickname}}：</span>
-			      						</template>
+		      							<div class="comment-avatar avatar" v-if="i.avatar" :style="{ backgroundImage: 'url(' + i.avatar + ')'}"></div>
+		      							<div class="comment-avatar avatar avatar-default" v-else></div>
+			      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === item.objectId">{{i.nickname}}（作者）：</span>
+			      						<span class="comment-name flex1" v-if="userInfo && userInfo.objectId === i.userid">我：</span>
+			      						<span class="comment-name flex1" v-else>{{i.nickname}}：</span>
 			      						<span class="comment-time">{{i.time | formatTime}}</span></div>
 			      					<p class="comment-content">{{i.comment}}</p>
 			      				</div>
@@ -178,6 +178,7 @@ export default {
   			}
   		},
   		commenSubmit(id, index) {
+  			let This = this;
   			let that = event.currentTarget;
   			if (!this.userInfo) {
   				Func.toast('请先登录');
@@ -199,6 +200,13 @@ export default {
   				index: index,
   				callback: function() {
   					that.parentNode.querySelector('.comment-input').value = '';
+  					let listWrapper = that.parentNode.parentNode.querySelector('.comment-list-wrapper');
+			      	This.$nextTick(function(){
+			        	if(listWrapper.scrollHeight <= listWrapper.offsetHeight){
+			          		return;
+				        }
+				        listWrapper.scrollTop = listWrapper.scrollHeight - listWrapper.offsetHeight;
+			      	})
   				}
   			}
   			this.$store.dispatch('commentArticle', option);

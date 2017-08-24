@@ -166,20 +166,15 @@ const actions = {
 	        .then((response) => {
 	    		//更新评论
 	    		let OPTIONS1 = JSON.parse(JSON.stringify(OPTIONS));
-				OPTIONS1.params = {keys: 'comments,commentUsers'};
+				OPTIONS1.params = {keys: 'comments,commentUsers,commentsNumber'};
 				OPTIONS1.emulateJSON = true;
 				Vue.http.get(BASEDATA.baseUrl+'/'+option.data.id, OPTIONS1)
 			        .then((response) => { 
-			        	response.data.index = option.index;
-			        	response.data.name = name;
-			        	commit('updateComments', response.data);
-			        	if (option.callback) {
-			        		option.callback();
-			        	}
-			        	Func.toast('评论成功');	
-
 			        	// //获取每条评论的用户信息
 				    	let commentList = response.data.comments;
+				    	let commentUsers = response.data.commentUsers;
+	        			let commentsNumber = response.data.commentsNumber;
+
 				    	let OPTIONS2 = JSON.parse(JSON.stringify(OPTIONS));
 						OPTIONS2.params = {keys: 'nickname,avatar'};
 						OPTIONS2.emulateJSON = true;
@@ -196,9 +191,15 @@ const actions = {
 						        		let data = {
 						        			index: option.index,
 						        			comments: commentList,
+						        			commentUsers: commentUsers,
+				        					commentsNumber: commentsNumber,
 						        			name: name
 						        		}
 						        		commit('setComments', data);
+						        		if (option.callback) {
+							        		option.callback();
+							        	}
+							        	Func.toast('评论成功');	
 						        		return;
 						        	}
 						        })

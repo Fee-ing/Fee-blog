@@ -4,7 +4,7 @@ const mutations = {
 	},
 	setArticleList(state, data) {
     if (data.refresh) {
-      state[data.name].articles = [];
+      // state[data.name].articles = [];
       state[data.name].articles = data.results;
     } else {
       state[data.name].articles = state[data.name].articles.concat(data.results);
@@ -29,11 +29,18 @@ const mutations = {
   },
   updateLikes(state, data) {
     state[data.name].articles[data.index].likes = data.likes;
-    state[data.name].articles[data.index].likeUsers = data.likeUsers
+    state[data.name].articles[data.index].likeUsers = data.likeUsers;
+    let fee = state[data.name].articles;
+    state[data.name].articles = [];
+    state[data.name].articles = fee;
   },
   updateComments(state, data) {
-    state[data.name].articles[data.index].comments = data.comments;
-    state[data.name].articles[data.index].commentUsers = data.commentUsers
+    // state[data.name].articles[data.index].comments = data.comments;
+    state[data.name].articles[data.index].commentUsers = data.commentUsers;
+    state[data.name].articles[data.index].commentsNumber = data.commentsNumber;
+    let fee = state[data.name].articles;
+    state[data.name].articles = [];
+    state[data.name].articles = fee;
   },
   setArticle(state, content) {
     state.article = content;
