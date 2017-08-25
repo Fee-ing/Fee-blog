@@ -1,4 +1,4 @@
-# editor
+# 一个简易版的个人博客
 
 > A Vue.js project
 
