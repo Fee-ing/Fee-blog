@@ -3,6 +3,7 @@
 > 本着好玩的目的写了这个项目，仅供参考，欢迎指正。要是您“高抬贵手”，star一下下，更加欢迎啦：)
 
 ## Build Setup
+> 推荐使用yarn或者cnpm
 
 ``` bash
 # install dependencies
@@ -26,6 +27,17 @@ npm run build --report
 在线预览地址： [Fee's Zone](https://fee-ing.github.io) (请务必用电脑打开，且尽量使用高版本浏览器)
 
 ## 预览图
+#### 首页
+![首页](https://github.com/Fee-ing/previewImages/blob/master/Fee-editor/home.png)
+#### 登录页
+![登录页](https://github.com/Fee-ing/previewImages/blob/master/Fee-editor/login.png)
+#### 发布文章页
+![发布文章页](https://github.com/Fee-ing/previewImages/blob/master/Fee-editor/article.png)
+#### 用户主页
+![用户主页](https://github.com/Fee-ing/previewImages/blob/master/Fee-editor/user.png)
+#### 个人信息页
+![个人信息页](https://github.com/Fee-ing/previewImages/blob/master/Fee-editor/setting.png)
+
 
 ## 主要目录结构
 
@@ -58,5 +70,18 @@ npm run build --report
 │   ├── App.vue        
 │   └── main.js       
 </pre>
+
+## 已实现功能
+- [x]   首页展示
+- [x]   用户登录注册
+- [x]   发布文章、编辑文章
+- [x]   增添或修改个人信息
+- [x]   用户主页展示
+- [x]   文章点赞或者评论
+
+## Todo
+* 关注用户
+* 关注用户互访
+* 实时通知文章更新或者有用户点赞评论
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
