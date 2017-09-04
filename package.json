@@ -33,7 +33,6 @@
     "html-webpack-plugin": "^2.28.0",
     "http-proxy-middleware": "^0.17.3",
     "leancloud-storage": "^3.0.0",
-    "leanengine": "^3.0.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.4",
     "lrz": "",

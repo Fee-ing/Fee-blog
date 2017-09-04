@@ -56,28 +56,28 @@ var Func = {
 		let now = new Date();
   		let Y, M, D, h, m, s;
   		let _Y, _M, _D, _h, _m, _s;
-  		Y = date.getFullYear();
-  		M = date.getMonth();
-  		D = date.getDate();
-  		h = date.getHours();
-  		m = date.getMinutes();
-  		s = date.getSeconds();
+  		Y = parseInt(date.getFullYear());
+  		M = parseInt(date.getMonth()) + 1;
+  		D = parseInt(date.getDate());
+  		h = parseInt(date.getHours());
+  		m = parseInt(date.getMinutes());
+  		s = parseInt(date.getSeconds());
 
-  		_Y = now.getFullYear();
-  		_M = now.getMonth();
-  		_D = now.getDate();
-  		_h = now.getHours();
-  		_m = now.getMinutes();
-  		_s = now.getSeconds();
+  		_Y = parseInt(now.getFullYear());
+  		_M = parseInt(now.getMonth()) + 1;
+  		_D = parseInt(now.getDate());
+  		_h = parseInt(now.getHours());
+  		_m = parseInt(now.getMinutes());
+  		_s = parseInt(now.getSeconds());
 
   		if (_Y - Y > 1) {
   			return (_Y - Y) + '年前';
   		}
   		if (_Y - Y > 0) {
-  			return '去年'+ M + 1 +'月';
+  			return '去年'+ M +'月';
   		}
   		if (_M - M > 0) {
-  			return '今年'+ M + 1 +'月';
+  			return '今年'+ M +'月';
   		}
   		if (_D - D > 1) {
   			return (_D - D) +'天前';

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import AV from 'leanengine'
+import AV from 'leancloud-storage'
 import router from '../router'
 import BASEDATA from '../assets/js/config.js'
 import TIP from '../assets/js/tip.js'

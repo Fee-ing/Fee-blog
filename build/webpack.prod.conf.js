@@ -52,6 +52,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: config.build.index,
       template: 'index.html',
+      favicon: path.resolve(__dirname, '../src/assets/imgs/fee.ico'),
       inject: true,
       minify: {
         removeComments: true,
