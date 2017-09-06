@@ -14,8 +14,6 @@ const router = new VueRouter({
   },{
     path:'/user',component:require('../views/user')
   },{
-    path:'/music',component:require('../views/music')
-  },{
     path:'/tip',component:require('../views/tip')
   },{
     path:'/',redirect:'/home'

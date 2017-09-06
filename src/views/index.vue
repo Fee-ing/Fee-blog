@@ -25,7 +25,7 @@
 	      		<div class="content-list" v-for="(item, index) in homeArticle.articles" v-if="item.user">
 	      			<div class="info-wrapper flexbox border-bottom">
 	      				<div class="avatar info-avatar" v-if="item.user.avatar" :style="{ backgroundImage: 'url(' + item.user.avatar + ')'}"></div>
-	      				<div class="avatar info-avatar avatar.avatar-default" v-else></div>
+	      				<div class="avatar info-avatar avatar avatar-default" v-else></div>
 	      				<div class="info-content flex1">
 	      					<div class="info-name"><b>{{item.user.nickname}}</b>&nbsp;&nbsp;{{item.user.location ? '('+item.user.location+')' : ''}}</div>
 	      					<div class="info-sign">{{item.user.sign ? item.user.sign : '无'}}</div>
