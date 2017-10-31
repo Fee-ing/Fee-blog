@@ -242,7 +242,7 @@ const actions = {
     	commit('saveUserInfo', null);
     	Func.delCookie('Fee_userInfo');
     	dispatch('getArticleList');
-		Func.toast('退出登录');
+		Func.toast('退出登录成功');
     },
     getUser({commit}, option) {
     	Vue.http.get(BASEDATA.userUrl+'/'+option.id, OPTIONS)		//获取用户信息
