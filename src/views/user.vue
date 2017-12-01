@@ -26,16 +26,19 @@
 	      		<div class="content-list" v-for="(item, index) in articles.articles" v-if="item.user">
 	      			<div class="info-wrapper flexbox border-bottom">
 	      				<div class="avatar info-avatar" v-if="item.user.avatar" :style="{ backgroundImage: 'url(' + item.user.avatar + ')'}"></div>
-	      				<div class="avatar info-avatar .avatar-default" v-else></div>
+	      				<div class="avatar info-avatar avatar-default" v-else></div>
 	      				<div class="info-content flex1">
 	      					<div class="info-name"><b>{{item.user.nickname}}</b>&nbsp;&nbsp;{{item.user.location ? '('+item.user.location+')' : ''}}</div>
 	      					<div class="info-sign">{{item.user.sign ? item.user.sign : '无'}}</div>
 	      				</div>
 	      				<router-link class="edit-btn verticalbox iconfont icon-bianji" v-if="userInfo && item.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.objectId} }">编辑</router-link>  
 	      			</div>
-	      			<div class="list-wrapper flexbox" @click="showParagraph">
-	      				<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
-	      	  			<div class="paragraph" v-html="item.content"></div>
+	      			<div class="list-wrapper" @click="showParagraph">
+						<div class="flexbox">
+							<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
+	      	  				<div class="paragraph" v-html="item.content"></div>
+						</div>
+	      				<div class="hold-up"><a class="hold-up-btn" @click.stop="holdParagraph">▲收起</a></div>
 	      			</div>
 	      			<div class="option-wrapper verticalbox">
 	      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId, index)">{{item.likes > 0 ? item.likes : ''}}</a>
@@ -155,12 +158,19 @@ export default {
   			this.$store.dispatch('getUserArticle', {userid: this.userInfo.objectId, name: this.name});
   		},
   		showParagraph() {
-  			if (event.currentTarget.className.indexOf('open') >= 0) {
-  				event.currentTarget.className = 'list-wrapper flexbox';
-  			}else {
-  				event.currentTarget.className = 'list-wrapper flexbox open';
+  			if (event.currentTarget.className.indexOf('open') < 0) {
+				  event.currentTarget.className = 'list-wrapper open';
+				  if (event.currentTarget.offsetHeight > 80) {
+					  event.currentTarget.className = 'list-wrapper open show-hold';
+				  }
   			}
   		},
+		holdParagraph () {
+			let parent = event.currentTarget.parentNode.parentNode;
+			if (parent.className.indexOf('open') >= 0) {
+				  parent.className = 'list-wrapper';
+  			}
+		},
   		changeTab(name) {
   			this.name = name;
   			if (!this.userInfo) {

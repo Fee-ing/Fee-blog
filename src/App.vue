@@ -26,7 +26,8 @@ export default {
   min-width: 800px;
   color: #333;
   font-size: 15px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: #fff;
   .editor-wrapper{
     height: 100%;
@@ -48,8 +49,7 @@ export default {
     .editor-content{
       position: relative;
       width: 800px;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
       margin: 0 auto;
       background-color: #fff;
       padding-top: 50px;
@@ -61,10 +61,8 @@ export default {
         }
       }
       .content-wrapper{
-        height: 100%;
         padding: 50px 50px 0px;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
         .content-list{
           width: 85%;
           padding: 20px 30px;
@@ -159,8 +157,23 @@ export default {
                 -webkit-box-orient: vertical;
                 cursor: pointer;
               }
+            .hold-up{
+              display: none;
+              overflow: hidden;
+              direction: rtl;
+              margin-top: 10px;
+              .hold-up-btn{
+                display: inline-block;
+                padding: 5px 10px;
+                color: #666;
+                &:hover{
+                  color: #333;
+                }
+              }
+            }
             &.open{
               max-height: none;
+              min-height: 80px;
               .first-img{
                 display: none;
               }
@@ -169,6 +182,11 @@ export default {
                 height: auto;
                 text-overflow: clip;
                 -webkit-line-clamp: unset;
+              }
+            }
+            &.show-hold{
+              .hold-up{
+                display: block;
               }
             }
           }

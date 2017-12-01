@@ -32,9 +32,12 @@
 	      				</div>
 	      				<router-link class="edit-btn verticalbox iconfont icon-bianji" v-if="userInfo && item.userid === userInfo.objectId" :to="{ path:'/article', query: {id: item.objectId} }">编辑</router-link>  
 	      			</div>
-	      			<div class="list-wrapper flexbox" @click="showParagraph">
-	      				<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
-	      	  			<div class="paragraph" v-html="item.content"></div>
+	      			<div class="list-wrapper" @click="showParagraph">
+						<div class="flexbox">
+							<div class="first-img" v-if="item.pic" :style="{ backgroundImage: 'url(' + item.pic + ')'}"></div>
+	      	  				<div class="paragraph" v-html="item.content"></div>
+						</div>
+	      				<div class="hold-up"><a class="hold-up-btn" @click.stop="holdParagraph">▲收起</a></div>
 	      			</div>
 	      			<div class="option-wrapper verticalbox">
 	      				<a class="option-btn iconfont" v-bind:class="item.likeUsers | isLike(userInfo)" @click="favorOpt(item.objectId, index)">{{item.likes > 0 ? item.likes : ''}}</a>
@@ -93,7 +96,7 @@ export default {
   		}
   	},
   	mounted() {
-  		this.contentWrapper = document.getElementById('content-wrapper');
+  		this.contentWrapper = document.getElementById('app');
   		this.windowHeight = document.body.clientHeight || document.documentElement.clientHeight;
   		this.contentWrapper.addEventListener('scroll', this.scrollOpt);
   	},
@@ -149,12 +152,19 @@ export default {
   			this.contentWrapper.scrollTop = 0;
   		},
   		showParagraph() {
-  			if (event.currentTarget.className.indexOf('open') >= 0) {
-  				event.currentTarget.className = 'list-wrapper flexbox';
-  			}else {
-  				event.currentTarget.className = 'list-wrapper flexbox open';
+  			if (event.currentTarget.className.indexOf('open') < 0) {
+				  event.currentTarget.className = 'list-wrapper open';
+				  if (event.currentTarget.offsetHeight > 80) {
+					  event.currentTarget.className = 'list-wrapper open show-hold';
+				  }
   			}
   		},
+		holdParagraph () {
+			let parent = event.currentTarget.parentNode.parentNode;
+			if (parent.className.indexOf('open') >= 0) {
+				  parent.className = 'list-wrapper';
+  			}
+		},
   		logoutOpt() {
   			this.$store.dispatch('logout')
   		},
