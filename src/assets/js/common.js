@@ -71,16 +71,16 @@ var Func = {
   		_s = parseInt(now.getSeconds());
 
   		if (_Y - Y > 1) {
-  			return (_Y - Y) + '年前';
+  			return (_Y - Y) + '年前'+ M +'月' + D + '号' + h + '点';
   		}
   		if (_Y - Y > 0) {
-  			return '去年'+ M +'月';
+  			return '去年'+ M +'月' + D + '号' + h + '点';
   		}
   		if (_M - M > 0) {
-  			return '今年'+ M +'月';
+  			return '今年'+ M +'月' + D + '号' + h + '点';
   		}
   		if (_D - D > 1) {
-  			return (_D - D) +'天前';
+  			return (_D - D) +'天前' + h + '点';
   		}
   		if (_D - D > 0) {
   			return '昨天' + h + '点';
