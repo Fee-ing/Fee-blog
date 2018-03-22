@@ -73,7 +73,7 @@ html, body{
           left: 0;
           top: 0;
           height: 100%;
-          padding: 80px 50px 0px;
+          padding: 80px 50px 30px;
           overflow-y: auto;
           img{
             cursor: pointer;
