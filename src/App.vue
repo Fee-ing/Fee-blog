@@ -14,6 +14,10 @@ export default {
 </script>
 
 <style lang="less">
+html, body{
+  position: relative;
+  height: 100%;
+}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -68,8 +72,12 @@ export default {
           width: 100%;
           left: 0;
           top: 0;
-          min-height: 100%;
+          height: 100%;
           padding: 80px 50px 0px;
+          overflow-y: auto;
+          img{
+            cursor: pointer;
+          }
         }
         .link-blank{
           color: #3385ff;

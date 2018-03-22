@@ -8,9 +8,14 @@ import './assets/css/reset.css'
 import './assets/css/iconfont.css'
 import './assets/css/common.css'
 import './assets/css/pace-theme-minimal.css'
+import './assets/css/viewImage.css'
 
 import './assets/js/pace.min.js'
 import Func from './assets/js/common.js'
+import feeViewImage from './assets/js/viewImage.js'
+
+let viewImage = new feeViewImage()
+viewImage.start()
 
 Vue.use(VueResource)
 

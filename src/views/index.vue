@@ -86,7 +86,8 @@ export default {
       		isShowUser: false,
       		contentWrapper: null,
       		windowHeight: 0,
-      		scrollTop: 0
+					scrollTop: 0,
+					listHeight: 0
     	}
   	},
   	created() {
@@ -152,6 +153,7 @@ export default {
   		},
   		showParagraph() {
   			if (event.currentTarget.className.indexOf('open') < 0) {
+					this.listHeight = event.currentTarget.offsetHeight + event.currentTarget.parentNode.offsetHeight;
 				  event.currentTarget.className = 'list-wrapper open';
 				  if (event.currentTarget.offsetHeight > 80) {
 					  event.currentTarget.className = 'list-wrapper open show-hold';
@@ -161,8 +163,9 @@ export default {
 		holdParagraph () {
 			let parent = event.currentTarget.parentNode.parentNode;
 			if (parent.className.indexOf('open') >= 0) {
-				  parent.className = 'list-wrapper';
-  			}
+				this.contentWrapper.scrollTop = this.contentWrapper.scrollTop - parent.offsetHeight + this.listHeight + 20
+				parent.className = 'list-wrapper';
+			}
 		},
   		logoutOpt() {
   			this.$store.dispatch('logout')
