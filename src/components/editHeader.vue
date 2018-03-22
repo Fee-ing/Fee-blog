@@ -39,6 +39,7 @@
           <button type="button" unselectable="on" class="toolbar-item italic" title="斜体" data-key="italic" @click.stop="editOpt"></button>
           <button type="button" unselectable="on" class="toolbar-item underline" title="下划线" data-key="underline" @click.stop="editOpt"></button>
           <button type="button" unselectable="on" class="toolbar-item strikethrough" title="中划线" data-key="strikethrough" @click.stop="editOpt"></button>
+          <button type="button" unselectable="on" class="toolbar-item link" title="超链接" data-key="createLink" @click.stop="createLinkOpt"></button>
           <button type="button" unselectable="on" class="toolbar-item toolbar-item-select fontcolor" title="字体颜色" @click.stop="getFontcolor">
             <span class="new-icon-down"></span>
             <span class="line" :style="{ backgroundColor: fontColorText }"></span>
@@ -113,6 +114,9 @@ export default {
   mounted() {
   	let that = this;
   	document.onclick = function(e) {
+      if (e.target.className === 'link-blank' && e.target.getAttribute('href')) {
+        window.open(e.target.getAttribute('href'));
+      }
   	  that.init();
   	}
   },
@@ -195,6 +199,19 @@ export default {
       let key = that.getAttribute('data-key');
       document.execCommand(key,false,null);
     },
+    createLinkOpt(e){
+      this.clearStyle()
+      e.currentTarget.className += ' active';
+      let sText = document.getSelection();
+      if (sText.toString().replace(/(^\s*)|(\s*$)/g, '') === '') {
+        return
+      }
+      let urlReg = /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&?[a-zA-Z0-9_-](\?)?)*)*$/gi;
+      let url = window.prompt("请输入链接", "http://");
+      if (urlReg.test(url)) {
+        document.execCommand('insertHTML', false, '<a class="link-blank" href="' + url + '" target="_blank">' + sText + '</a>');
+      }
+    },
     fontSize(size, text){
       document.execCommand('fontSize',false,size);
       this.fontsizeText = text;
@@ -217,19 +234,22 @@ export default {
     addImg(){
       let that = this;
       lrz(event.currentTarget.files[0])
-            .then(function (rst) {
-              that.pic = rst.base64;
-              that.$emit('add-img', rst.base64);
-            })
-            .catch(function (err) {
-              Func.toast('图片上传失败');
-            });
+      .then(function (rst) {
+        that.pic = rst.base64;
+        that.$emit('add-img', rst.base64);
+      })
+      .catch(function (err) {
+        Func.toast('图片上传失败');
+      });
     },
     clearOpt(){
       this.$emit('clear-html');
     },
     deleteOpt(){
-      this.$emit('deltet-article');
+      let confirm = window.confirm('确认删除文章？');
+      if (confirm) {
+        this.$emit('deltet-article');
+      }
     },
     saveOpt(){
       this.$emit('add-article');
@@ -433,6 +453,9 @@ export default {
         &.justifyFull{
           background-position: -421px 0;
         }
+      }
+      &.link{
+        background-position: -451px 0;
       }
       &.image{
         background-position: -511px 0;

@@ -103,10 +103,7 @@ export default {
   		this.contentWrapper.addEventListener('scroll', this.scrollOpt);
   	},
   	computed: {
-  		...mapGetters(['userArticles']),
-  		...mapGetters(['userFavorArticles']),
-  		...mapGetters(['userCommentArticles']),
-  		...mapGetters(['userInfo']),
+  		...mapGetters(['userArticles', 'userFavorArticles', 'userCommentArticles', 'userInfo']),
   		articles() {
   			return this[this.name];
   		}

@@ -2,7 +2,7 @@
   <div class="editor-wrapper">
     <edit-header :type="type" :userid="article.userid" @add-img="addImg" @clear-html="clearHtml" @deltet-article="deleteArticleOpt" @add-article="submitArticleOpt"></edit-header>
     <div class="editor-content">
-      <div id="content-wrapper" class="content-wrapper" contenteditable="true" v-html="article.content"></div>
+      <div id="content-wrapper" class="content-wrapper article-content" contenteditable="true" v-html="article.content"></div>
     </div>
   </div>
 </template>
@@ -32,8 +32,7 @@ export default {
     this.fetchData();
   },
   computed: {
-      ...mapGetters(['article']),
-      ...mapGetters(['userInfo'])
+      ...mapGetters(['article', 'userInfo']),
   },
   watch: {
     '$route': 'fetchData'
@@ -42,8 +41,11 @@ export default {
     fetchData() {
       let id = this.$route.query.id || null;
       this.type = id ? '2' : '1';
-      this.$store.dispatch('getArticle', id);
+      if (this.type === '1') {
+        this.contentWrapper.focus();
+      }
       this.contentWrapper.innerHTML = '';
+      this.$store.dispatch('getArticle', id);
     },
     insertHtmlAtCaret(str) {
       let that = this;

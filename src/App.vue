@@ -63,6 +63,20 @@ export default {
       .content-wrapper{
         padding: 50px 50px 0px;
         overflow: hidden;
+        &.article-content{
+          position: absolute;
+          width: 100%;
+          left: 0;
+          top: 0;
+          min-height: 100%;
+          padding: 80px 50px 0px;
+        }
+        .link-blank{
+          color: #3385ff;
+          &:hover{
+            text-decoration: underline;
+          }
+        }
         .content-list{
           width: 85%;
           padding: 20px 30px;
@@ -140,6 +154,7 @@ export default {
               background-size: cover;
               margin-right: 15px;
               border-radius: 3px;
+              cursor: pointer;
             }
             .paragraph{
               height: 80px;
