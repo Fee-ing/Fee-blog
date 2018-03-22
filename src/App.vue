@@ -75,9 +75,6 @@ html, body{
           height: 100%;
           padding: 80px 50px 30px;
           overflow-y: auto;
-          img{
-            cursor: pointer;
-          }
         }
         .link-blank{
           color: #3385ff;

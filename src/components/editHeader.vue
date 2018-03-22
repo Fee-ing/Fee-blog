@@ -206,11 +206,8 @@ export default {
       if (sText.toString().replace(/(^\s*)|(\s*$)/g, '') === '') {
         return
       }
-      let urlReg = /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&?[a-zA-Z0-9_-](\?)?)*)*$/gi;
       let url = window.prompt("请输入链接", "http://");
-      if (urlReg.test(url)) {
-        document.execCommand('insertHTML', false, '<a class="link-blank" href="' + url + '" target="_blank">' + sText + '</a>');
-      }
+      document.execCommand('insertHTML', false, '<a class="link-blank" href="' + url + '" target="_blank">' + sText + '</a>');
     },
     fontSize(size, text){
       document.execCommand('fontSize',false,size);
