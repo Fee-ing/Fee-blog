@@ -17,7 +17,7 @@
 			<div class="avatar avatar-default"></div>
 				<span class="name">登录/注册</span>
 			</router-link>
-			<h1 class="edit-heading-title" @click="refresh">Fee's&nbsp;&nbsp;Zone</h1>
+			<h1 class="edit-heading-title" @click="refresh">Fee's&nbsp;&nbsp;Blog</h1>
 			<a class="iconfont icon-add heading-button add-button" @click="addArticle"></a>
 		</div>
 		<div class="editor-content">
