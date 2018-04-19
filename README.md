@@ -24,7 +24,7 @@ npm run build --report
 >主要使用vue+vuex+vue-router+vue-resource开发，数据存储这块是使用LeanCloud提供的开发版云引擎（LeanEngine），最重要的是该服务是免费的，但是每天的请求次数是有限制的，不过已足够满足需求了。有兴趣的童鞋可以去尝试一下，这里放一下[LeanEngine文档链接](https://leancloud.cn/docs/leanengine_overview.html)
 
 ## 在线预览
-在线预览地址： [Fee's Zone](https://fee-ing.github.io/Fee-blog) (请务必用电脑打开，且尽量使用高版本浏览器)
+在线预览地址： [Fee's Blog](https://fee-ing.github.io/Fee-blog) (请务必用电脑打开，且尽量使用高版本浏览器)
 
 ## 预览图
 #### 首页
