@@ -1,7 +1,7 @@
 {
-  "name": "editor",
+  "name": "Fee-Blog",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "description": "迷你博客",
   "author": "YF <2809750987@qq.com>",
   "private": true,
   "scripts": {
