@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
-        <edit-header :type="type"  @add-img="addImg" @clear-html="clearHtml" @deltet-article="deleteArticleOpt" @add-article="submitArticleOpt"></edit-header>
+        <edit-header :type="type"  @add-img="addImg" @clear-html="clearOpt" @deltet-article="deleteOpt" @add-article="submitOpt"></edit-header>
       </div>
     </div>
     <div class="page-body">
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import editHeader from '../components/editHeader.vue'
 
 export default {
@@ -29,12 +29,26 @@ export default {
     editHeader
   },
   created () {
+    if (this.$route.query.id) {
+      this.type = '2'
+    } else {
+      this.type = '1'
+    }
+  },
+  mounted () {
     this.contentWrapper = document.getElementById('content-wrapper')
+    if (!this.$route.query.id) {
+      this.contentWrapper.focus()
+    }
   },
   computed: {
     ...mapState(['userInfo'])
   },
   methods: {
+    ...mapActions({
+      createBlog: 'blog/createBlog',
+      updateBlog: 'blog/updateBlog'
+    }),
     insertHtmlAtCaret (str) {
       let sel, range
       if (window.getSelection) {
@@ -63,11 +77,13 @@ export default {
         document.selection.createRange().pasteHTML(str)
       }
     },
-    getPicSrc (str) {
+    getBlogInfo (blog) {
       let picArr = []
       let imgReg = /<img.*?(?:>|\/>)/gi
       let srcReg = /src=['"]?([^'"]*)['"]?/i
-      let arr = str.match(imgReg)
+      let str = blog.replace(imgReg, '')
+      let paragraph = str.length <= 150 ? str : str.slice(0, 150)
+      let arr = blog.match(imgReg)
       if (arr) {
         arr.forEach(element => {
           let src = element.match(srcReg)
@@ -75,9 +91,15 @@ export default {
             picArr.push(src[1])
           }
         })
-        return picArr[0]
+        return {
+          cover: picArr[0],
+          paragraph
+        }
       } else {
-        return ''
+        return {
+          cover: '',
+          paragraph
+        }
       }
     },
     addImg (url) {
@@ -85,27 +107,61 @@ export default {
       let flg = '<img src="' + url + '">'
       this.insertHtmlAtCaret(flg)
     },
-    clearHtml () {
+    clearOpt () {
       this.contentWrapper.innerHTML = ''
     },
-    deleteArticleOpt () {
+    deleteOpt () {
       if (this.$route.query.id) {
         this.$store.dispatch('deleteArticle', this.$route.query.id)
       }
     },
-    submitArticleOpt () {
-      if (this.contentWrapper.innerHTML) {
-        let picSrc = this.getPicSrc(this.contentWrapper.innerHTML)
-        let option = {
-          type: this.type,
-          pic: picSrc,
-          content: this.contentWrapper.innerHTML,
-          userid: this.userInfo.objectId
+    async submitOpt () {
+      if (this.contentWrapper.innerHTML.replace(/(^\s*)|(\s*$)/, '') === '') {
+        return
+      }
+      let blog = this.contentWrapper.innerHTML.replace(/(^\s*)|(\s*$)/, '').replace(/<script[^>]*>[\s\S]*?<\/[^>]*script>/gi, '')
+      let blogInfo = this.getBlogInfo(blog)
+      let params = {
+        params1: {
+          cover: blogInfo.cover,
+          paragraph: blogInfo.paragraph,
+          like: 0,
+          comment: 0,
+          view: 0,
+          type: '1'
+        },
+        params2: {
+          content: blog,
+          likes: [],
+          comments: [],
+          view: 0,
+          type: '1'
+        },
+        user: {
+          userid: this.userInfo.objectId,
+          nickname: this.userInfo.nickname,
+          avatar: this.userInfo.avatar,
+          location: this.userInfo.location || '',
+          sign: this.userInfo.sign || ''
         }
-        if (this.$route.query.id) {
-          option.id = this.$route.query.id
+      }
+      if (this.type === '1') {
+        let res = await this.createBlog(params)
+        if (res) {
+          this.$toast({
+            title: '发布成功'
+          })
+          this.$router.go(-1)
         }
-        this.$store.dispatch('submitArticle', option)
+      } else if (this.type === '2' && this.$route.query.id) {
+        params.id = this.$route.query.id
+        let res = await this.updateBlog(params)
+        if (res) {
+          this.$toast({
+            title: '更新成功'
+          })
+          this.$router.go(-1)
+        }
       }
     }
   }
@@ -115,8 +171,8 @@ export default {
 <style lang="less" scoped>
 .editor-wrapper{
   .page-body-content{
-    height: 100%;
     .content-wrapper{
+      min-height: 200px;
       border: none;
       outline: none;
     }

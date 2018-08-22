@@ -6,18 +6,18 @@ export default {
   async regist ({ dispatch }, options) {
     try {
       await Request.post(API.userAPI, options)
-      let data = await dispatch('login', options)
-      return data
+      let res = await dispatch('login', options)
+      return res
     } catch (error) {
       return false
     }
   },
   async login ({ commit }, options) {
     try {
-      let data = await Request.post(API.loginAPI, options)
-      commit('setUserInfo', data)
-      setCookie('Blog_userInfo', JSON.stringify(data))
-      return data
+      let res = await Request.post(API.loginAPI, options)
+      commit('setUserInfo', res)
+      setCookie('Blog_userInfo', JSON.stringify(res))
+      return res
     } catch (error) {
       return false
     }
