@@ -1,56 +1,20 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import actions from './actions.js'
-import mutations from './mutations.js'
-// import lists from './modules/lists.js'
-import Func from '../assets/js/common.js'
+import actions from './actions'
+import mutations from './mutations'
+import home from './modules/home'
+
+import { getCookie } from '../plugins/func'
 
 Vue.use(Vuex)
 
-let userInfo = Func.getCookie('Fee_userInfo') || null;
-
-const store = new Vuex.Store({
+export default new Vuex.Store({
   state: {
-    userInfo: userInfo ? JSON.parse(userInfo) : null,
-    homeArticle: {
-      articles: [],
-      limit: 30,
-      skip: 0,
-      nomore: false
-    },
-    userArticles: {
-      articles: [],
-      limit: 30,
-      skip: 0,
-      nomore: false
-    },
-    userFavorArticles: {
-      articles: [],
-      limit: 30,
-      skip: 0,
-      nomore: false
-    },
-    userCommentArticles: {
-      articles: [],
-      limit: 30,
-      skip: 0,
-      nomore: false
-    },
-    article: {},
+    userInfo: (getCookie('Blog_userInfo') && JSON.parse(getCookie('Blog_userInfo'))) || null
   },
-  mutations,
   actions,
-  getters: {
-    userInfo: state=>state.userInfo,
-    homeArticle: state=>state.homeArticle,
-    article: state=>state.article,
-    userArticles: state=>state.userArticles,
-    userFavorArticles: state=>state.userFavorArticles,
-    userCommentArticles: state=>state.userCommentArticles
-  },
+  mutations,
   modules: {
-  	// lists
+    home
   }
 })
-
-export default store

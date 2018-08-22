@@ -1,79 +1,76 @@
-<template lang="html">
-  <div class="edit-heading">
-    <router-link class="iconfont icon-fanhui heading-button back-button" to="/">返回</router-link>
-    <div class="edit-heading-container">
-      <ul class="editbar-list">
-        <li class="editbar-list-item">
-          <button type="button" unselectable="on" class="toolbar-item undo" title="撤销" data-key="undo" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item redo" title="重做" data-key="redo" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item clear-format" title="清除格式" data-key="removeFormat" @click.stop="editOpt"></button>
-        </li>
-        <li class="separator editbar-list-item"></li>
-        <li class="editbar-list-item">
-          <ul class="toolbar-menu toolbar-menu-list toolbar-text-list" v-show="fontsizeBol">
-            <li class="menu-list-item"><button type="button" unselectable="on" title="10px" @click.stop="fontSize('1','10px')">10px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="13px" @click.stop="fontSize('2','13px')">13px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="16px" @click.stop="fontSize('3','16px')">16px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="18px" @click.stop="fontSize('4','18px')">18px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="24px" @click.stop="fontSize('5','24px')">24px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="32px" @click.stop="fontSize('6','32px')">32px</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="48px" @click.stop="fontSize('7','48px')">48px</button></li>
-          </ul>
-          <ul class="toolbar-menu toolbar-color-list" v-if="fontcolorBol">
-            <li class="color-list-item" v-for="item in colorList"><button type="button" unselectable="on" :style="{ backgroundColor: '#'+item.color }" :title="item.title" @click.stop="fontColor('#'+item.color)"></button></li>
-          </ul>
-          <ul class="toolbar-menu toolbar-color-list toolbar-color-list1" v-if="backcolorBol">
-            <li class="color-list-item" v-for="item in colorList"><button type="button" unselectable="on" :style="{ backgroundColor: '#'+item.color }" :title="item.title" @click.stop="backColor('#'+item.color)"></button></li>
-          </ul>
-          <ul class="toolbar-menu toolbar-menu-list toolbar-align-list" v-if="alignBol">
-            <li class="menu-list-item"><button type="button" unselectable="on" title="左对齐" @click.stop="alignOpt('justifyLeft')"><span class="menu-list-left"></span></button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="居中" @click.stop="alignOpt('justifyCenter')"><span class="menu-list-center"></span></button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="右对齐" @click.stop="alignOpt('justifyRight')"><span class="menu-list-right"></span></button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="两端对齐" @click.stop="alignOpt('justifyFull')"><span class="menu-list-justify"></span></button></li>
-          </ul>
-          <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getFontsize">
-            {{fontsizeText}}
-            <span class="new-icon-down"></span>
-          </button>
-          <button type="button" unselectable="on" class="toolbar-item bold" title="粗体" data-key="bold" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item italic" title="斜体" data-key="italic" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item underline" title="下划线" data-key="underline" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item strikethrough" title="中划线" data-key="strikethrough" @click.stop="editOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item link" title="超链接" data-key="createLink" @click.stop="createLinkOpt"></button>
-          <button type="button" unselectable="on" class="toolbar-item toolbar-item-select fontcolor" title="字体颜色" @click.stop="getFontcolor">
-            <span class="new-icon-down"></span>
-            <span class="line" :style="{ backgroundColor: fontColorText }"></span>
-          </button>
-          <button type="button" unselectable="on" class="toolbar-item toolbar-item-select backcolor" title="背景颜色" @click.stop="getBackcolor">
-            <span class="new-icon-down"></span>
-            <span class="line" :style="{ backgroundColor: backColorText }"></span>
-          </button>
-          <button type="button" unselectable="on" class="toolbar-item toolbar-item-select align-toolbar" :class="alignText" title="对齐" @click.stop="getAlign"><span class="new-icon-down"></span></button>
-        </li>
-        <li class="separator editbar-list-item"></li>
-        <li class="editbar-list-item">
-          <ul class="toolbar-menu toolbar-menu-list toolbar-text-list" v-if="textBol">
-            <li class="menu-list-item"><button type="button" unselectable="on" title="段落" @click.stop="addText('p')">段落</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="大标题" @click.stop="addText('h1')">大标题</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="中标题" @click.stop="addText('h2')">中标题</button></li>
-            <li class="menu-list-item"><button type="button" unselectable="on" title="小标题" @click.stop="addText('h3')">小标题</button></li>
-          </ul>
-          <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getText">文字<span class="new-icon-down"></span></button>
-          <button type="button" unselectable="on" class="toolbar-item image" title="图片">
-            <input type="file" accept="*.png,*.jpg,*.jpeg,*gif" unselectable="on" class="image-input" @change.stop="addImg">
-          </button>
-          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空内容" @click.stop="clearOpt">清空内容</button>
-          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2' && userid === userInfo.objectId" @click.stop="deleteOpt">删除文章</button>
-          <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
-        </li>
-      </ul>
-    </div>
+<template>
+  <div class="edit-header">
+    <ul class="editbar-list">
+      <li class="editbar-list-item">
+        <button type="button" unselectable="on" class="toolbar-item undo" title="撤销" data-key="undo" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item redo" title="重做" data-key="redo" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item clear-format" title="清除格式" data-key="removeFormat" @click.stop="execCommandOpt"></button>
+      </li>
+      <li class="separator editbar-list-item"></li>
+      <li class="editbar-list-item">
+        <ul class="toolbar-menu toolbar-menu-list toolbar-text-list" v-show="fontsizeBol">
+          <li class="menu-list-item"><button type="button" unselectable="on" title="10px" @click.stop="fontSize('1','10px')">10px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="13px" @click.stop="fontSize('2','13px')">13px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="16px" @click.stop="fontSize('3','16px')">16px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="18px" @click.stop="fontSize('4','18px')">18px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="24px" @click.stop="fontSize('5','24px')">24px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="32px" @click.stop="fontSize('6','32px')">32px</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="48px" @click.stop="fontSize('7','48px')">48px</button></li>
+        </ul>
+        <ul class="toolbar-menu toolbar-color-list" v-if="fontcolorBol">
+          <li class="color-list-item" v-for="(item, index) in colorList" :key="index"><button type="button" unselectable="on" :style="{ backgroundColor: '#'+item.color }" :title="item.title" @click.stop="fontColor('#'+item.color)"></button></li>
+        </ul>
+        <ul class="toolbar-menu toolbar-color-list toolbar-color-list1" v-if="backcolorBol">
+          <li class="color-list-item" v-for="(item, index) in colorList" :key="index"><button type="button" unselectable="on" :style="{ backgroundColor: '#'+item.color }" :title="item.title" @click.stop="backColor('#'+item.color)"></button></li>
+        </ul>
+        <ul class="toolbar-menu toolbar-menu-list toolbar-align-list" v-if="alignBol">
+          <li class="menu-list-item"><button type="button" unselectable="on" title="左对齐" @click.stop="alignOpt('justifyLeft')"><span class="menu-list-left"></span></button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="居中" @click.stop="alignOpt('justifyCenter')"><span class="menu-list-center"></span></button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="右对齐" @click.stop="alignOpt('justifyRight')"><span class="menu-list-right"></span></button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="两端对齐" @click.stop="alignOpt('justifyFull')"><span class="menu-list-justify"></span></button></li>
+        </ul>
+        <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getFontsize">
+          {{fontsizeText}}
+          <span class="new-icon-down"></span>
+        </button>
+        <button type="button" unselectable="on" class="toolbar-item bold" title="粗体" data-key="bold" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item italic" title="斜体" data-key="italic" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item underline" title="下划线" data-key="underline" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item strikethrough" title="中划线" data-key="strikethrough" @click.stop="execCommandOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item link" title="超链接" data-key="createLink" @click.stop="createLinkOpt"></button>
+        <button type="button" unselectable="on" class="toolbar-item toolbar-item-select fontcolor" title="字体颜色" @click.stop="getFontcolor">
+          <span class="new-icon-down"></span>
+          <span class="line" :style="{ backgroundColor: fontColorText }"></span>
+        </button>
+        <button type="button" unselectable="on" class="toolbar-item toolbar-item-select backcolor" title="背景颜色" @click.stop="getBackcolor">
+          <span class="new-icon-down"></span>
+          <span class="line" :style="{ backgroundColor: backColorText }"></span>
+        </button>
+        <button type="button" unselectable="on" class="toolbar-item toolbar-item-select align-toolbar" :class="alignText" title="对齐" @click.stop="getAlign"><span class="new-icon-down"></span></button>
+      </li>
+      <li class="separator editbar-list-item"></li>
+      <li class="editbar-list-item">
+        <ul class="toolbar-menu toolbar-menu-list toolbar-text-list" v-if="textBol">
+          <li class="menu-list-item"><button type="button" unselectable="on" title="段落" @click.stop="addText('p')">段落</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="大标题" @click.stop="addText('h1')">大标题</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="中标题" @click.stop="addText('h2')">中标题</button></li>
+          <li class="menu-list-item"><button type="button" unselectable="on" title="小标题" @click.stop="addText('h3')">小标题</button></li>
+        </ul>
+        <button type="button" unselectable="on" class="toolbar-item toolbar-item-select font" title="文字" @click.stop="getText">文字<span class="new-icon-down"></span></button>
+        <button type="button" unselectable="on" class="toolbar-item image" title="图片">
+          <input type="file" accept="*.png,*.jpg,*.jpeg,*gif" unselectable="on" class="image-input" @change.stop="addImg">
+        </button>
+        <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空内容" @click.stop="clearOpt">清空内容</button>
+        <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2' && userid === userInfo.objectId" @click.stop="deleteOpt">删除文章</button>
+        <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
+      </li>
+    </ul>
   </div>
 </template>
+
 <script>
 import lrz from 'lrz'
-import Func from '../assets/js/common.js'
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -86,16 +83,16 @@ export default {
       default: ''
     }
   },
-  data() {
+  data () {
     return {
-      colorList: [{color:'ffffff',title:'白'},{color:'0d0015',title:'漆黑'},{color:'fe2c23',title:'红'},{color:'ff9900',title:'橙'},{color:'ffd900',title:'黄'},{color:'a3e043',title:'葱绿'},{color:'37d9f0',title:'湖蓝'},
-                  {color:'4da8ee',title:'天蓝'},{color:'aa17d0',title:'紫'},{color:'f3f3f1',title:'白练'},{color:'949494',title:'鼠灰'},{color:'fcdbd6',title:'虹'},{color:'fde9d0',title:'薄卵'},{color:'fff0cf',title:'蒸栗'},
-                  {color:'d4e9d6',title:'白绿'},{color:'def3f3',title:'蓝白'},{color:'cee0ef',title:'天空'},{color:'dfdbec',title:'紫水晶'},{color:'dcdedd',title:'白鼠'},{color:'595856',title:'墨'},{color:'ee837d',title:'甚三红'},
-                  {color:'f8c387',title:'雄黄'},{color:'e6b322',title:'金色'},{color:'9abd9d',title:'薄青'},{color:'83ccd2',title:'白群'},{color:'89b0ce',title:'薄花'},{color:'9389b1',title:'紫苑'},{color:'c1c6ca',title:'灰青'},
-                  {color:'41464b',title:'石墨'},{color:'d51228',title:'绯红'},{color:'cf770b',title:'红金'},{color:'8d634a',title:'枯茶'},{color:'557b5c',title:'绿青'},{color:'01a3b0',title:'浅葱'},{color:'3776a6',title:'薄缥'},
-                  {color:'765c83',title:'紫霞'},{color:'adadad',title:'薄钝'},{color:'2b2b2b',title:'黑'},{color:'a91913',title:'朱绯'},{color:'884702',title:'褐'},{color:'563725',title:'黑茶'},{color:'00552e',title:'深绿'},
-                  {color:'00767a',title:'苍蓝'},{color:'194e77',title:'琉璃'},{color:'530e6f',title:'葡萄'}
-                ],
+      colorList: [{color: 'ffffff', title: '白'}, {color: '0d0015', title: '漆黑'}, {color: 'fe2c23', title: '红'}, {color: 'ff9900', title: '橙'}, {color: 'ffd900', title: '黄'}, {color: 'a3e043', title: '葱绿'}, {color: '37d9f0', title: '湖蓝'},
+        {color: '4da8ee', title: '天蓝'}, {color: 'aa17d0', title: '紫'}, {color: 'f3f3f1', title: '白练'}, {color: '949494', title: '鼠灰'}, {color: 'fcdbd6', title: '虹'}, {color: 'fde9d0', title: '薄卵'}, {color: 'fff0cf', title: '蒸栗'},
+        {color: 'd4e9d6', title: '白绿'}, {color: 'def3f3', title: '蓝白'}, {color: 'cee0ef', title: '天空'}, {color: 'dfdbec', title: '紫水晶'}, {color: 'dcdedd', title: '白鼠'}, {color: '595856', title: '墨'}, {color: 'ee837d', title: '甚三红'},
+        {color: 'f8c387', title: '雄黄'}, {color: 'e6b322', title: '金色'}, {color: '9abd9d', title: '薄青'}, {color: '83ccd2', title: '白群'}, {color: '89b0ce', title: '薄花'}, {color: '9389b1', title: '紫苑'}, {color: 'c1c6ca', title: '灰青'},
+        {color: '41464b', title: '石墨'}, {color: 'd51228', title: '绯红'}, {color: 'cf770b', title: '红金'}, {color: '8d634a', title: '枯茶'}, {color: '557b5c', title: '绿青'}, {color: '01a3b0', title: '浅葱'}, {color: '3776a6', title: '薄缥'},
+        {color: '765c83', title: '紫霞'}, {color: 'adadad', title: '薄钝'}, {color: '2b2b2b', title: '黑'}, {color: 'a91913', title: '朱绯'}, {color: '884702', title: '褐'}, {color: '563725', title: '黑茶'}, {color: '00552e', title: '深绿'},
+        {color: '00767a', title: '苍蓝'}, {color: '194e77', title: '琉璃'}, {color: '530e6f', title: '葡萄'}
+      ],
       fontsizeBol: false,
       fontcolorBol: false,
       backcolorBol: false,
@@ -109,147 +106,137 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapState(['userInfo'])
   },
-  mounted() {
-  	let that = this;
-  	document.onclick = function(e) {
+  mounted () {
+    let that = this
+    document.onclick = (e) => {
       if (e.target.className === 'link-blank' && e.target.getAttribute('href')) {
-        window.open(e.target.getAttribute('href'));
+        window.open(e.target.getAttribute('href'))
       }
-  	  that.init();
-  	}
+      that.init()
+    }
   },
   methods: {
-    init(){
-      this.fontsizeText = '字号';
-      this.fontColorText = 'transparent';
-      this.backColorText = 'transparent';
-      this.alignText = '';
-      this.fontsizeBol = false;
-      this.alignBol = false;
-      this.backcolorBol = false;
-      this.fontcolorBol = false;
-      this.textBol = false;
-      this.clearStyle();
+    removeClass (ele, cls) {
+      let reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
+      ele.className = ele.className.replace(reg, '')
     },
-    clearStyle(){
-      let toolbarItem = document.querySelectorAll('.toolbar-item');
-      for (let i = 0, len = toolbarItem.length; i < len; i++) {
-      	if (toolbarItem[i].className.match(new RegExp('(\\s|^)active(\\s|$)'))) {
-      	  let reg = new RegExp('(\\s|^)active(\\s|$)');
-          toolbarItem[i].className = toolbarItem[i].className.replace(reg, ' ');
-      	}
-      }
-    },
-    getFontsize(e){
+    init () {
       this.clearStyle()
-      e.currentTarget.className += ' active';
-      this.alignBol = false;
-      this.backcolorBol = false;
-      this.fontcolorBol = false;
-      this.textBol = false;
-      let bol = this.fontsizeBol;
-      this.fontsizeBol = !bol;
+      this.initStyle()
     },
-    getFontcolor(e){
-      this.clearStyle()
-      e.currentTarget.className += ' active';
-      this.fontsizeBol = false;
-      this.alignBol = false;
-      this.textBol = false;
-      this.backcolorBol = false;
-      let bol = this.fontcolorBol;
-      this.fontcolorBol = !bol;
+    initMenuBol () {
+      this.fontsizeBol = false
+      this.alignBol = false
+      this.backcolorBol = false
+      this.fontcolorBol = false
+      this.textBol = false
     },
-    getBackcolor(e){
-      this.clearStyle()
-      e.currentTarget.className += ' active';
-      this.fontsizeBol = false;
-      this.alignBol = false;
-      this.textBol = false;
-      this.fontcolorBol = false;
-      let bol = this.backcolorBol;
-      this.backcolorBol = !bol;
+    initStyle () {
+      this.fontsizeText = '字号'
+      this.fontColorText = 'transparent'
+      this.backColorText = 'transparent'
+      this.alignText = ''
+      this.initMenuBol()
     },
-    getAlign(e){
-      this.clearStyle()
-      e.currentTarget.className += ' active';
-      this.fontsizeBol = false;
-      this.textBol = false;
-      this.backcolorBol = false;
-      this.fontcolorBol = false;
-      let bol = this.alignBol;
-      this.alignBol = !bol;
+    clearStyle () {
+      let toobarItem = document.querySelectorAll('.toolbar-item') || []
+      toobarItem.forEach(element => {
+        this.removeClass(element, 'active')
+      })
+      // for (let i = 0, len = toobarItem.length;i < len;i ++) {
+      //   this.removeClass(toobarItem[i], 'active')
+      // }
     },
-    getText(e){
+    initBol (target, ele) {
       this.clearStyle()
-      e.currentTarget.className += ' active';
-      this.fontsizeBol = false;
-      this.alignBol = false;
-      this.backcolorBol = false;
-      this.fontcolorBol = false;
-      let bol = this.textBol;
-      this.textBol = !bol;
+      target.className += ' active'
+      let eleArr = ['fontsizeBol', 'alignBol', 'backcolorBol', 'fontcolorBol', 'textBol']
+      eleArr.forEach(element => {
+        if (element === ele) {
+          let bol = this[ele]
+          this[ele] = !bol
+        } else {
+          this[element] = false
+        }
+      })
     },
-    editOpt(e){
-      this.clearStyle()
-      e.currentTarget.className += ' active';
-      let that = e.currentTarget;
-      let key = that.getAttribute('data-key');
-      document.execCommand(key,false,null);
+    getFontsize (e) {
+      this.initBol(e.currentTarget, 'fontsizeBol')
     },
-    createLinkOpt(e){
-      this.clearStyle()
-      e.currentTarget.className += ' active';
-      let sText = document.getSelection();
+    getFontcolor (e) {
+      this.initBol(e.currentTarget, 'fontcolorBol')
+    },
+    getBackcolor (e) {
+      this.initBol(e.currentTarget, 'backcolorBol')
+    },
+    getAlign (e) {
+      this.initBol(e.currentTarget, 'alignBol')
+    },
+    getText (e) {
+      this.initBol(e.currentTarget, 'textBol')
+    },
+    execCommandOpt (e) {
+      this.initBol(e.currentTarget, null)
+      let key = e.currentTarget.getAttribute('data-key')
+      document.execCommand(key, false, null)
+    },
+    createLinkOpt (e) {
+      this.initBol(e.currentTarget, null)
+      let sText = document.getSelection()
       if (sText.toString().replace(/(^\s*)|(\s*$)/g, '') === '') {
         return
       }
-      let url = window.prompt("请输入链接", "http://");
-      document.execCommand('insertHTML', false, '<a class="link-blank" href="' + url + '" target="_blank">' + sText + '</a>');
+      let url = window.prompt('请输入链接', 'http://')
+      document.execCommand('insertHTML', false, '<a class="link-blank" href="' + url + '" target="_blank">' + sText + '</a>')
     },
-    fontSize(size, text){
-      document.execCommand('fontSize',false,size);
-      this.fontsizeText = text;
+    fontSize (size, text) {
+      document.execCommand('fontSize', false, size)
+      this.fontsizeText = text
+      this.fontcolorBol = false
     },
-    fontColor(color){
-      document.execCommand('ForeColor',false,color);
-      this.fontColorText = color;
+    fontColor (color) {
+      document.execCommand('ForeColor', false, color)
+      this.fontColorText = color
+      this.fontcolorBol = false
     },
-    backColor(color){
-      document.execCommand('BackColor',false,color);
-      this.backColorText = color;
+    backColor (color) {
+      document.execCommand('BackColor', false, color)
+      this.backColorText = color
+      this.backcolorBol = false
     },
-    alignOpt(type){
-      document.execCommand(type,false,null);
-      this.alignText = type;
+    alignOpt (type) {
+      document.execCommand(type, false, null)
+      this.alignText = type
+      this.alignBol = false
     },
-    addText(role){
-      document.execCommand('formatBlock', false, '<' + role + '>');
+    addText (role) {
+      document.execCommand('formatBlock', false, '<' + role + '>')
+      this.textBol = false
     },
-    addImg(){
-      let that = this;
-      lrz(event.currentTarget.files[0])
-      .then(function (rst) {
-        that.pic = rst.base64;
-        that.$emit('add-img', rst.base64);
+    addImg () {
+      let that = this
+      lrz(event.currentTarget.files[0]).then(function (rst) {
+        that.pic = rst.base64
+        that.$emit('add-img', rst.base64)
+      }).catch(() => {
+        this.$toast({
+          title: '图片上传失败'
+        })
       })
-      .catch(function (err) {
-        Func.toast('图片上传失败');
-      });
     },
-    clearOpt(){
-      this.$emit('clear-html');
+    clearOpt () {
+      this.$emit('clear-html')
     },
-    deleteOpt(){
-      let confirm = window.confirm('确认删除文章？');
+    deleteOpt () {
+      let confirm = window.confirm('确认删除文章？')
       if (confirm) {
-        this.$emit('deltet-article');
+        this.$emit('deltet-article')
       }
     },
-    saveOpt(){
-      this.$emit('add-article');
+    saveOpt () {
+      this.$emit('add-article')
     }
   }
 }
@@ -327,7 +314,7 @@ export default {
       display: inline-block;
       height: 100%;
       width: 27px;
-      background-image: url(../assets/imgs/editor.png);
+      background-image: url(../assets/images/editor.png);
       background-repeat: no-repeat;
       background-size: 800px 100px;
       &.menu-list-left{
@@ -359,9 +346,8 @@ export default {
   }
 }
 .editbar-list{
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  display: flex;
+  align-items: center;
   .editbar-list-item{
     user-select: none;
     float: left;
@@ -397,7 +383,7 @@ export default {
       outline: none;
       border: none;
       background-color: transparent;
-      background-image: url(../assets/imgs/editor.png);
+      background-image: url(../assets/images/editor.png);
       background-repeat: no-repeat;
       background-size: 800px 100px;
       position: relative;
@@ -498,7 +484,7 @@ export default {
         position: absolute;
         width: 5px;
         height: 100%;
-        background-image: url(../assets/imgs/editor.png);
+        background-image: url(../assets/images/editor.png);
         background-repeat: no-repeat;
         background-size: 800px 100px;
         background-position: -642px 0;

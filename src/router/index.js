@@ -1,26 +1,27 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-Vue.use(VueRouter)
+import Router from 'vue-router'
+import Login from '@/pages/Login'
+import Home from '@/pages/Home'
+import Blog from '@/pages/Blog'
 
-const router = new VueRouter({
-  routes:[{
-    path:'/home',component:require('../views/index')
-  },{
-    path:'/login',component:require('../views/login')
-  },{
-    path:'/setting',component:require('../views/setting')
-  },{
-    path:'/article',component:require('../views/article')
-  },{
-    path:'/user',component:require('../views/user')
-  },{
-    path:'/tip',component:require('../views/tip')
-  },{
-    path:'/',redirect:'/home'
-  },{
-    path:'*',redirect:'/home'
-  }]
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
+    },
+    {
+      path: '/',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/blog',
+      name: 'blog',
+      component: Blog
+    }
+  ]
 })
-
-
-export default router

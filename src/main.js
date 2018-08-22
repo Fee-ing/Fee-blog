@@ -2,41 +2,19 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-import VueResource from 'vue-resource'
+import { toast } from './plugins/func'
 
-import './assets/css/reset.css'
-import './assets/css/iconfont.css'
-import './assets/css/common.css'
-import './assets/css/pace-theme-minimal.css'
-import './assets/css/viewImage.css'
-
-import './assets/js/pace.min.js'
-import Func from './assets/js/common.js'
-import feeViewImage from './assets/js/viewImage.js'
-
-let viewImage = new feeViewImage()
-viewImage.start()
-
-Vue.use(VueResource)
+import './assets/css/theme.less'
 
 Vue.config.productionTip = false
 
-let isPhone = (navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))
-let isRightVersion = Func.explorerVersion()
+Vue.prototype.$toast = toast
 
-router.beforeEach((to, from, next) => {
-	if (isPhone && to.path !== '/tip') {
-	    next({path: '/tip', query: {type: '1'}}) 
-  	} else if(!isRightVersion && to.path !== '/tip') {
-    	next({path: '/tip', query: {type: '2'}})
-  	} else {
-  		next()
-  	}
-})
-
+/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
-  render: h => h(App)
+  components: { App },
+  template: '<App/>'
 })
