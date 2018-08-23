@@ -25,9 +25,7 @@
             <div class="likes-conent">
               <div class="likes-item" v-for="(item, index) in likeData.list" :key="index">
                 <div class="likes-info">
-                  <span v-if="item.avatar" class="avatar background-image" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></span>
-                  <span v-else class="avatar background-image avatar-default"></span>
-                  <span class="name">{{item.nickname}}</span>
+                  <userCommon :userInfo="item" class="small-avatar"></userCommon>
                 </div>
               </div>
             </div>
@@ -294,26 +292,15 @@ export default {
           padding-left: 15px;
           .likes-item{
             display: inline-block;
-            height: 24px;
+            height: 25px;
             margin-top: 10px;
             margin-left: 10px;
-            cursor: pointer;
             &:first-child{
               margin-left: 0;
             }
             .likes-info{
               display: flex;
               align-items: center;
-            }
-            .avatar{
-              display: inline-block;
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              margin-right: 4px;
-              &.avatar-default{
-                background-image: url(../assets/images/default-avatar.png);
-              }
             }
           }
         }

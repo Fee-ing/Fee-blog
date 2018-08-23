@@ -33,9 +33,14 @@ export default {
 .user-wrapper{
   display: flex;
   align-items: center;
-  &.small-avatar .user-avatar{
-    width: 25px;
-    height: 25px;
+  &.small-avatar{
+    .user-avatar{
+      width: 25px;
+      height: 25px;
+    }
+    .user-info .user-name{
+      font-size: 11px;
+    }
   }
   .user-avatar{
     width: 35px;
