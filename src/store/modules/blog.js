@@ -161,6 +161,7 @@ const mutations = {
       list: [],
       isLiked: false
     }
+    state.comments = []
   },
   setBlog (state, data) {
     state.blogData = data
