@@ -2,13 +2,14 @@ export function toast (options) {
   let toast = document.getElementById('toast') || null
   if (toast && toast.className === '') {
     let config = {
-      duration: options.duration || 1500,
+      duration: options.duration || 2000,
       title: options.title || ''
     }
     toast.innerHTML = config.title
     toast.className = 'show'
     setTimeout(() => {
       toast.className = ''
+      toast.innerHTML = ''
     }, config.duration)
   }
 }

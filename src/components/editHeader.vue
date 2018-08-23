@@ -61,7 +61,7 @@
           <input type="file" accept="*.png,*.jpg,*.jpeg,*gif" unselectable="on" class="image-input" @change.stop="addImg">
         </button>
         <button type="button" unselectable="on" class="toolbar-item button edit-button" title="清空内容" @click.stop="clearOpt">清空内容</button>
-        <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="type === '2' && userid === userInfo.objectId" @click.stop="deleteOpt">删除文章</button>
+        <button type="button" unselectable="on" class="toolbar-item button edit-button" title="删除文章" v-if="showDelete" @click.stop="deleteOpt">删除</button>
         <button type="button" unselectable="on" class="toolbar-item button edit-button" title="保存" @click.stop="saveOpt">保存</button>
       </li>
     </ul>
@@ -70,17 +70,12 @@
 
 <script>
 import lrz from 'lrz'
-import { mapState } from 'vuex'
 
 export default {
   props: {
-    type: {
-      type: String,
-      default: '1'
-    },
-    userid: {
-      type: String,
-      default: ''
+    showDelete: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -104,9 +99,6 @@ export default {
       alignText: '',
       pic: ''
     }
-  },
-  computed: {
-    ...mapState(['userInfo'])
   },
   mounted () {
     let that = this
@@ -232,11 +224,11 @@ export default {
     deleteOpt () {
       let confirm = window.confirm('确认删除文章？')
       if (confirm) {
-        this.$emit('deltet-article')
+        this.$emit('deltet-blog')
       }
     },
     saveOpt () {
-      this.$emit('add-article')
+      this.$emit('add-blog')
     }
   }
 }

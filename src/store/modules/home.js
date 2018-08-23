@@ -2,13 +2,17 @@ import { API } from '../../api/index'
 import Request from '../../api/request'
 
 const state = {
+  blogList: []
 }
 
 const getters = {
+  blogList: (state) => {
+    return state.blogList
+  }
 }
 
 const actions = {
-  async getBlogList ({ commit }, options) {
+  async getBlogList ({ commit }) {
     try {
       let config = {
         params: {
@@ -19,6 +23,9 @@ const actions = {
         }
       }
       let res = await Request.get(API.blogListAPI, config)
+      if (res && res.results) {
+        commit('setBlogList', res.results)
+      }
       return res
     } catch (error) {
       return false
@@ -27,6 +34,9 @@ const actions = {
 }
 
 const mutations = {
+  setBlogList (state, list) {
+    state.blogList = list
+  }
 }
 
 export default {

@@ -3,20 +3,59 @@
     <div class="page-header">
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
-        <edit-header :type="type"  @add-img="addImg" @clear-html="clearOpt" @deltet-article="deleteOpt" @add-article="submitOpt"></edit-header>
+        <edit-header v-if="type === '1' || showDelete" :showDelete="showDelete"  @add-img="addImg" @clear-html="clearOpt" @deltet-blog="deleteOpt" @add-blog="submitOpt"></edit-header>
       </div>
     </div>
     <div class="page-body">
       <div class="page-body-content">
-        <div id="content-wrapper" class="content-wrapper article-content" contenteditable="true"></div>
+        <userCommon v-if="author" :userInfo="author">
+          <template slot="user-others">
+            <div class="info-item">作者</div>
+          </template>
+        </userCommon>
+        <div id="content-wrapper" class="content-wrapper" :contenteditable="type === '1' || showDelete" v-html="blogData.content"></div>
+        <div class="blog-info" v-if="type === '2'">
+          <div class="blog-options">
+            <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
+            <div class="blog-view">浏览 {{blogData.view}} 次</div>
+            <div class="favor-btn common-btn" @click="likeOpt">{{likeData.isLiked ? '已' : ''}}喜欢</div>
+          </div>
+          <div class="blog-likes blog-common" v-if="likeData.list.length > 0">
+            <div class="title">喜欢（{{likeData.list.length}}人）：</div>
+            <div class="likes-conent">
+              <div class="likes-item" v-for="(item, index) in likeData.list" :key="index">
+                <div class="likes-info">
+                  <span v-if="item.avatar" class="avatar background-image" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></span>
+                  <span v-else class="avatar background-image avatar-default"></span>
+                  <span class="name">{{item.nickname}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="blog-comments blog-common">
+            <div class="title">评论：</div>
+            <div class="comments-content">
+              <textarea cols="30" rows="3" placeholder="不超过100字" class="comments-input"></textarea>
+              <div class="comments-options">
+                <div class="comments-tips"></div>
+                <div class="comments-btn common-btn" @click="commentOpt">提交评论</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { formatTime } from '../plugins/func'
+
 import editHeader from '../components/editHeader.vue'
+import userCommon from '../components/userCommon.vue'
+
+import { createNamespacedHelpers } from 'vuex'
+const { mapGetters, mapActions } = createNamespacedHelpers('blog')
 
 export default {
   data () {
@@ -26,29 +65,32 @@ export default {
     }
   },
   components: {
-    editHeader
+    editHeader,
+    userCommon
   },
-  created () {
-    if (this.$route.query.id) {
+  async created () {
+    if (this.$route.query.blogid) {
       this.type = '2'
     } else {
       this.type = '1'
     }
+    await this.getBlog({type: this.type, blogid: this.$route.query.blogid || ''})
+    if (this.type === '2' && this.blogData.userid !== this.userInfo.objectId) {
+      this.viewBlog()
+    }
   },
   mounted () {
     this.contentWrapper = document.getElementById('content-wrapper')
-    if (!this.$route.query.id) {
+    if (!this.$route.query.blogid) {
       this.contentWrapper.focus()
     }
   },
   computed: {
-    ...mapState(['userInfo'])
+    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData'])
   },
   methods: {
-    ...mapActions({
-      createBlog: 'blog/createBlog',
-      updateBlog: 'blog/updateBlog'
-    }),
+    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog']),
+    formatTime,
     insertHtmlAtCaret (str) {
       let sel, range
       if (window.getSelection) {
@@ -110,9 +152,13 @@ export default {
     clearOpt () {
       this.contentWrapper.innerHTML = ''
     },
-    deleteOpt () {
-      if (this.$route.query.id) {
-        this.$store.dispatch('deleteArticle', this.$route.query.id)
+    async deleteOpt () {
+      let res = await this.deleteBlog()
+      if (res) {
+        this.$toast({
+          title: '删除成功'
+        })
+        this.$router.go(-1)
       }
     },
     async submitOpt () {
@@ -127,20 +173,16 @@ export default {
           paragraph: blogInfo.paragraph,
           like: 0,
           comment: 0,
-          view: 0,
-          type: '1'
+          view: 0
         },
         params2: {
           content: blog,
-          likes: [],
-          comments: [],
-          view: 0,
-          type: '1'
+          view: 0
         },
         user: {
           userid: this.userInfo.objectId,
           nickname: this.userInfo.nickname,
-          avatar: this.userInfo.avatar,
+          avatar: this.userInfo.avatar || '',
           location: this.userInfo.location || '',
           sign: this.userInfo.sign || ''
         }
@@ -153,8 +195,7 @@ export default {
           })
           this.$router.go(-1)
         }
-      } else if (this.type === '2' && this.$route.query.id) {
-        params.id = this.$route.query.id
+      } else if (this.type === '2' && this.$route.query.blogid && this.userInfo.objectId === this.blogData.userid) {
         let res = await this.updateBlog(params)
         if (res) {
           this.$toast({
@@ -163,18 +204,128 @@ export default {
           this.$router.go(-1)
         }
       }
+    },
+    likeOpt () {
+      let params = {
+        likeid: this.blogData.likeid,
+        blogid: this.$route.query.blogid,
+        user: {
+          userid: this.userInfo.objectId,
+          nickname: this.userInfo.nickname,
+          avatar: this.userInfo.avatar || ''
+        }
+      }
+      if (this.likeData.isLiked) {
+        this.unlikeBlog(params)
+      } else {
+        this.likeBlog(params)
+      }
+    },
+    commentOpt () {
+      this.$toast({
+        title: '123'
+      })
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+@import '../assets/css/color.less';
 .editor-wrapper{
   .page-body-content{
     .content-wrapper{
-      min-height: 200px;
       border: none;
       outline: none;
+      padding: 20px 40px;
+    }
+    .blog-info{
+      padding: 0 40px;
+      .blog-options{
+        display: flex;
+        align-items: center;
+        font-size: 11px;
+        .blog-time{
+          flex: 1;
+          color: @gray;
+        }
+        .blog-view{
+          color: @gray;
+          margin-right: 15px;
+        }
+        .favor-btn{
+          font-size: 11px;
+        }
+      }
+      .blog-common{
+        margin-top: 30px;
+        .title{
+          font-size: 13px;
+          font-weight: bold;
+        }
+      }
+      .blog-likes{
+        .likes-conent{
+          font-size: 11px;
+          padding-left: 15px;
+          .likes-item{
+            display: inline-block;
+            height: 24px;
+            margin-top: 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            &:first-child{
+              margin-left: 0;
+            }
+            .likes-info{
+              display: flex;
+              align-items: center;
+            }
+            .avatar{
+              display: inline-block;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              margin-right: 4px;
+              &.avatar-default{
+                background-image: url(../assets/images/default-avatar.png);
+              }
+            }
+          }
+        }
+      }
+      .blog-comments{
+        .comments-content{
+          font-size: 12px;
+          padding-left: 15px;
+          .comments-input{
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            border-color: @gray;
+            border-radius: 4px;
+            resize: none;
+            font-size: 12px;
+            padding: 5px 8px;
+            outline: none;
+            transition: all 0.2s;
+            &:focus{
+              border-color: @black;
+            }
+          }
+          .comments-options{
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            .comments-tips{
+              flex: 1;
+            }
+            .comments-btn{
+              font-size: 11px;
+            }
+          }
+        }
+      }
     }
   }
 }

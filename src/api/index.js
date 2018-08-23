@@ -4,6 +4,8 @@ export const API = {
   baseAPI,
   blogListAPI: `${baseAPI}classes/blogList`,
   blogsAPI: `${baseAPI}classes/blogs`,
+  likesAPI: `${baseAPI}classes/likes`,
+  commentsAPI: `${baseAPI}classes/comments`,
   userAPI: `${baseAPI}users`,
   loginAPI: `${baseAPI}login`
 }

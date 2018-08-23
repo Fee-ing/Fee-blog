@@ -7,7 +7,7 @@
 
 img{
   display: block;
-  max-width: 90%;
+  max-width: 100%;
   margin: 10px auto;
 }
 
@@ -15,17 +15,22 @@ img{
   position: fixed;
   bottom: 15%;
   left: 50%;
+  z-index: 1000;
+  width: 0;
+  height: 26px;
+  line-height: 24px;
   color: #fff;
   font-size: 14px;
   transform: translate(-50%, 0);
-  transition: all 0.3s;
-  padding: 5px 10px;
+  transition: all 0.25s;
   border-radius: 4px;
   background-color: @black;
-  z-index: 1000;
   opacity: 0;
   visibility: hidden;
+  text-align: center;
   &.show{
+    width: auto;
+    padding: 0 10px;
     opacity: 1 !important;
     visibility: visible !important;
   }
@@ -94,7 +99,53 @@ html, body, #app{
     padding-top: 50px;
     box-shadow: 0 0 10px rgba(0,0,0,.25);
     .page-body-content{
-      padding: 20px 30px;
+      padding: 30px;
+    }
+  }
+}
+.blog-wrapper{
+  cursor: pointer;
+  margin-bottom: 50px;
+  .blog-header{
+
+  }
+  .blog-body{
+    display: flex;
+    margin-top: 10px;
+    padding-left: 40px;
+    .blog-cover{
+      width: 120px;
+      height: 80px;
+      border-radius: 4px;
+      margin-right: 15px;
+    }
+    .blog-paragraph{
+      flex: 1;
+      .blog-more{
+        color: @gray;
+        font-size: 12px;
+      }
+    }
+  }
+  .blog-footer{
+    display: flex;
+    margin-top: 15px;
+    padding-left: 40px;
+    .blog-time{
+      flex: 1;
+      font-size: 11px;
+      color: @gray;
+    }
+    .blog-info{
+      .info-item{
+        display: inline-block;
+        font-size: 12px;
+        margin-left: 10px;
+        span{
+          color: @gray;
+          margin-right: 5px;
+        }
+      }
     }
   }
 }
