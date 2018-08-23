@@ -33,12 +33,21 @@
             </div>
           </div>
           <div class="blog-comments blog-common">
-            <div class="title">评论：</div>
+            <div class="title">评论（{{comments.length}}条）：</div>
             <div class="comments-content">
-              <textarea cols="30" rows="3" placeholder="不超过100字" class="comments-input"></textarea>
+              <textarea cols="30" rows="3" placeholder="不超过100字" class="comments-input" v-model="commentContent"></textarea>
               <div class="comments-options">
                 <div class="comments-tips"></div>
                 <div class="comments-btn common-btn" @click="commentOpt">提交评论</div>
+              </div>
+              <div class="comments-list">
+                <div class="comments-item" v-for="(item, index) in comments" :key="index">
+                  <div class="comments-user">
+                    <userCommon :userInfo="item" class="small-avatar"></userCommon>
+                    <div class="comments-time">{{formatTime(item.time)}}</div>
+                  </div>
+                  <div class="comments-detail">{{item.comment}}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -61,7 +70,8 @@ export default {
   data () {
     return {
       contentWrapper: null,
-      type: '1'
+      type: '1',
+      commentContent: ''
     }
   },
   components: {
@@ -86,10 +96,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData'])
+    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData', 'comments'])
   },
   methods: {
-    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog']),
+    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'commentBlog']),
     formatTime,
     insertHtmlAtCaret (str) {
       let sel, range
@@ -207,13 +217,9 @@ export default {
     },
     likeOpt () {
       let params = {
-        likeid: this.blogData.likeid,
-        blogid: this.$route.query.blogid,
-        user: {
-          userid: this.userInfo.objectId,
-          nickname: this.userInfo.nickname,
-          avatar: this.userInfo.avatar || ''
-        }
+        userid: this.userInfo.objectId,
+        nickname: this.userInfo.nickname,
+        avatar: this.userInfo.avatar || ''
       }
       if (this.likeData.isLiked) {
         this.unlikeBlog(params)
@@ -221,10 +227,28 @@ export default {
         this.likeBlog(params)
       }
     },
-    commentOpt () {
-      this.$toast({
-        title: '123'
-      })
+    async commentOpt () {
+      let comment = this.commentContent.replace(/(^\s*)|(\s*$)/, '')
+      if (comment === '') {
+        return
+      }
+      if (comment.length > 100) {
+        this.$toast({
+          title: '评论不超过100字'
+        })
+        return
+      }
+      let params = {
+        userid: this.userInfo.objectId,
+        nickname: this.userInfo.nickname,
+        avatar: this.userInfo.avatar || '',
+        comment,
+        time: new Date()
+      }
+      let res = await this.commentBlog(params)
+      if (res) {
+        this.commentContent = ''
+      }
     }
   }
 }
@@ -322,6 +346,27 @@ export default {
             }
             .comments-btn{
               font-size: 11px;
+            }
+          }
+          .comments-list{
+            margin-top: 15px;
+            .comments-item{
+              margin-top: 20px;
+              .comments-user{
+                display: flex;
+                align-items: center;
+                margin-right: 10px;
+                .comments-time{
+                  font-size: 11px;
+                  flex: 1;
+                  text-align: right;
+                  color: @gray;
+                }
+              }
+              .comments-detail{
+                padding-left: 30px;
+                color: @gray;
+              }
             }
           }
         }

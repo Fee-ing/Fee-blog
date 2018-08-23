@@ -29,9 +29,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import '../assets/css/color.less';
 .user-wrapper{
   display: flex;
   align-items: center;
+  &.small-avatar .user-avatar{
+    width: 25px;
+    height: 25px;
+  }
   .user-avatar{
     width: 35px;
     height: 35px;
@@ -50,6 +55,7 @@ export default {
     }
     .info-item{
       font-size: 11px;
+      color: @gray;
     }
   }
 }

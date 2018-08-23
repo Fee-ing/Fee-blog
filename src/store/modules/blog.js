@@ -8,7 +8,8 @@ const state = {
   likeData: {
     list: [],
     isLiked: false
-  }
+  },
+  comments: []
 }
 
 const getters = {
@@ -26,6 +27,9 @@ const getters = {
   },
   likeData: (state) => {
     return state.likeData
+  },
+  comments: (state) => {
+    return state.comments.reverse()
   }
 }
 
@@ -43,6 +47,7 @@ const actions = {
           commit('setAuthor', {avatar: data.avatar || '', nickname: data.nickname || ''})
           commit('setShowDelete', data.userid === rootState.userInfo.objectId)
           dispatch('viewLikes', {likeid: data.likeid})
+          dispatch('viewCommons', {commentid: data.commentid})
         }
       }
       return true
@@ -104,21 +109,42 @@ const actions = {
       return false
     }
   },
-  async likeBlog ({ dispatch }, options) {
+  async likeBlog ({ state, dispatch }, options) {
     try {
-      await Request.put(`${API.blogListAPI}/${options.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
-      await Request.put(`${API.likesAPI}/${options.likeid}`, {users: {'__op': 'AddUnique', 'objects': [options.user]}})
-      dispatch('viewLikes', {likeid: options.likeid})
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
+      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [options]}})
+      dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
       return false
     }
   },
-  async unlikeBlog ({ dispatch }, options) {
+  async unlikeBlog ({ state, dispatch }, options) {
     try {
-      await Request.put(`${API.blogListAPI}/${options.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
-      await Request.put(`${API.likesAPI}/${options.likeid}`, {users: {'__op': 'Remove', 'objects': [options.user]}})
-      dispatch('viewLikes', {likeid: options.likeid})
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
+      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [options]}})
+      dispatch('viewLikes', {likeid: state.blogData.likeid})
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async viewCommons ({ commit }, options) {
+    try {
+      let res = await Request.get(`${API.commentsAPI}/${options.commentid}`)
+      if (res && res.comments && res.comments.length > 0) {
+        commit('setComments', res.comments)
+      }
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async commentBlog ({ state, dispatch }, options) {
+    try {
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {comment: {'__op': 'Increment', 'amount': 1}})
+      await Request.put(`${API.commentsAPI}/${state.blogData.commentid}`, {comments: {'__op': 'Add', 'objects': [options]}})
+      dispatch('viewCommons', {commentid: state.blogData.commentid})
       return true
     } catch (error) {
       return false
@@ -145,11 +171,14 @@ const mutations = {
   setShowDelete (state, bol) {
     state.showDelete = bol
   },
-  setLikeList (state, data) {
-    state.likeData.list = data
+  setLikeList (state, list) {
+    state.likeData.list = list
   },
   setIsLiked (state, bol) {
     state.likeData.isLiked = bol
+  },
+  setComments (state, list) {
+    state.comments = list
   }
 }
 

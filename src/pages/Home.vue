@@ -80,7 +80,6 @@ export default {
     cursor: pointer;
     margin-right: 10px;
     .user-info .user-logout{
-      color: @gray;
       font-size: 11px;
       transition: all 0.3s;
       &:hover{
