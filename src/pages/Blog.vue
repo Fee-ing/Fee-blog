@@ -131,8 +131,10 @@ export default {
       let picArr = []
       let imgReg = /<img.*?(?:>|\/>)/gi
       let srcReg = /src=['"]?([^'"]*)['"]?/i
-      let str = blog.replace(imgReg, '')
-      let paragraph = str.length <= 150 ? str : str.slice(0, 150)
+      let paragraph = blog.replace(imgReg, '')
+      if (paragraph.length > 150) {
+        paragraph = paragraph.substr(0, 150) + '...<span class="blog-more">查看更多</span>'
+      }
       let arr = blog.match(imgReg)
       if (arr) {
         arr.forEach(element => {

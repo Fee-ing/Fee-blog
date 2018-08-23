@@ -5,8 +5,7 @@
     </div>
     <div class="blog-body">
       <div v-if="blogData.cover" class="blog-cover background-image" :style="{ backgroundImage: 'url(' + blogData.cover + ')'}"></div>
-      <div class="blog-paragraph" v-if="blogData.paragraph.length > 150">{{blogData.paragraph}}...<span class="blog-more">查看更多</span></div>
-      <div class="blog-paragraph" v-else>{{blogData.paragraph}}</div>
+      <div class="blog-paragraph" v-html="blogData.paragraph"></div>
     </div>
     <div class="blog-footer">
       <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
@@ -66,6 +65,9 @@ export default {
     }
     .blog-paragraph{
       flex: 1;
+      .paragraph{
+        display: inline-block;
+      }
       .blog-more{
         color: @gray;
         font-size: 12px;

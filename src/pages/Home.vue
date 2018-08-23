@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <div class="page-header">
       <div class="page-header-content home-header">
-        <div class="home-header-title">搭建免费博客</div>
+        <div class="home-header-title"><span @click="getBlogList">搭建免费博客</span></div>
         <template v-if="userInfo">
           <userCommon :userInfo="userInfo" class="home-header-user" title="个人信息">
             <template slot="user-others">
@@ -75,6 +75,9 @@ export default {
     flex: 1;
     font-size: 20px;
     font-weight: bold;
+    span{
+      cursor: pointer;
+    }
   }
   .home-header-user{
     cursor: pointer;
