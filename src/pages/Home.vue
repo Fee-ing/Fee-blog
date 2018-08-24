@@ -4,7 +4,7 @@
       <div class="page-header-content home-header">
         <div class="home-header-title"><span @click="getBlogList">搭建免费博客</span></div>
         <template v-if="userInfo">
-          <userCommon :userInfo="userInfo" class="home-header-user" title="个人信息">
+          <userCommon :userInfo="userInfo" @view-user="viewUser" class="home-header-user" title="个人信息">
             <template slot="user-others">
               <div class="user-logout" title="退出登录" @click.stop="logoutOpt">退出登录</div>
             </template>
@@ -57,6 +57,9 @@ export default {
     },
     logoutOpt () {
       this.logout()
+    },
+    viewUser () {
+      this.$router.push({path: '/user', query: {userid: this.userInfo.objectId}})
     }
   }
 }

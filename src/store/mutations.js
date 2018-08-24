@@ -2,8 +2,9 @@ import { setCookie, delCookie } from '../plugins/func'
 
 export default {
   setUserInfo (state, data) {
-    state.userInfo = data
-    setCookie('Blog_userInfo', JSON.stringify(data))
+    let userInfo = state.userInfo ? JSON.parse(JSON.stringify(state.userInfo)) : {}
+    state.userInfo = Object.assign(userInfo, data)
+    setCookie('Blog_userInfo', JSON.stringify(state.userInfo))
   },
   clearUserInfo (state) {
     state.userInfo = null

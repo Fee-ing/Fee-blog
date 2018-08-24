@@ -29,6 +29,7 @@ export default {
       if (userid) {
         this.$router.push({path: '/user', query: {userid}})
       }
+      this.$emit('view-user')
     }
   }
 }

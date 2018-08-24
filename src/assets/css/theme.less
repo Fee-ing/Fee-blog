@@ -10,6 +10,17 @@ img{
   max-width: 100%;
   margin: 10px auto;
 }
+input, textarea{
+  outline: none;
+  border: none;
+  border: 1px solid @gray;
+  border-radius: 4px;
+  transition: all 0.3s;
+  font-size: inherit;
+  &:focus{
+    border-color: @black;
+  }
+}
 
 #toast{
   position: fixed;

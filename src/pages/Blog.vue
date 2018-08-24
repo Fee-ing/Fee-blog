@@ -188,9 +188,7 @@ export default {
         user: {
           userid: this.userInfo.objectId,
           nickname: this.userInfo.nickname,
-          avatar: this.userInfo.avatar || '',
-          location: this.userInfo.location || '',
-          sign: this.userInfo.sign || ''
+          avatar: this.userInfo.avatar || ''
         }
       }
       if (this.type === '1') {
@@ -311,16 +309,9 @@ export default {
             display: block;
             width: 100%;
             margin-top: 15px;
-            border-color: @gray;
-            border-radius: 4px;
             resize: none;
             font-size: 12px;
             padding: 5px 8px;
-            outline: none;
-            transition: all 0.2s;
-            &:focus{
-              border-color: @black;
-            }
           }
           .comments-options{
             display: flex;
