@@ -110,7 +110,12 @@ export default {
       let params = {
         username: this.registForm.phone,
         password: MD5(this.registForm.password),
-        nickname: '游客' + MD5(this.registForm.phone).substr(0, 6)
+        nickname: '游客' + MD5(this.registForm.phone).substr(0, 6),
+        avatar: '',
+        location: '',
+        qq: '',
+        wechat: '',
+        sign: ''
       }
       let res = await this.regist(params)
       if (res) {

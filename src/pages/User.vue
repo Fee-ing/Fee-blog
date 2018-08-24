@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
-        <div class="user-name">{{userData.nickname}}的主页</div>
+        <div class="user-name">{{isAuthor ? '我' : userData.nickname}}的主页</div>
       </div>
     </div>
     <div class="page-body">
@@ -14,7 +14,7 @@
             <div class="avatar background-image avatar-default" v-else></div>
             <div class="name">
               <span v-if="type === '1'">{{userData.nickname}}</span>
-              <input v-else type="text" placeholder="中英文，8字以内" v-model="userData.nickname">
+              <input v-else type="text" placeholder="8字以内" v-model="userData.nickname">
             </div>
             <div class="btn-wrapper" v-if="isAuthor">
               <div class="btn common-btn" @click="editOpt" v-if="type === '1'">编辑</div>
@@ -33,13 +33,6 @@
               <div class="right-content">
                 <span v-if="type === '1'">{{userData.location || '未设置'}}</span>
                 <input v-else type="text" placeholder="选填，不超过10个字" v-model="userData.location">
-              </div>
-            </div>
-            <div class="right-item" v-if="isAuthor">
-              <span class="right-title">邮箱：</span>
-              <div class="right-content">
-                <span v-if="type === '1'">{{userData.email || '未设置'}}</span>
-                <input v-else type="text" placeholder="选填" v-model="userData.email">
               </div>
             </div>
             <div class="right-item">
@@ -108,13 +101,12 @@ export default {
       let params = {
         nickname: (this.userData.nickname || '').replace(/\s/gi, ''),
         location: (this.userData.location || '').replace(/\s/gi, ''),
-        email: (this.userData.email || '').replace(/\s/gi, ''),
         qq: (this.userData.qq || '').replace(/\s/gi, ''),
         wechat: (this.userData.wechat || '').replace(/\s/gi, ''),
         sign: (this.userData.sign || '').replace(/\s/gi, '')
       }
       let signReg = /^[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5\u4e00-\u9fa5\w]{0,30}$/
-      if (!(/^[\u4e00-\u9fa5a-z]{1,8}$/i).test(params.nickname)) {
+      if (!(/^[\u4e00-\u9fa5a-z0-9]{1,8}$/i).test(params.nickname)) {
         this.$toast({
           title: '请填写正确的昵称'
         })
@@ -123,12 +115,6 @@ export default {
       if (params.location && !(/^[\u4e00-\u9fa5a-z0-9]{0,10}$/).test(params.location)) {
         this.$toast({
           title: '请填写正确的地址'
-        })
-        return
-      }
-      if (params.email && !(/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/).test(params.email)) {
-        this.$toast({
-          title: '请填写正确的邮箱'
         })
         return
       }
@@ -148,6 +134,20 @@ export default {
         this.$toast({
           title: '请填写正确的签名'
         })
+        return
+      }
+      let bol = true
+      for (const key in params) {
+        if (params.hasOwnProperty(key)) {
+          const element = params[key]
+          if (element !== this.userInfo[key]) {
+            bol = false
+            break
+          }
+        }
+      }
+      if (bol) {
+        this.type = '1'
         return
       }
       let res = await this.updateUser(params)
