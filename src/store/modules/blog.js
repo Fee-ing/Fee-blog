@@ -44,7 +44,7 @@ const actions = {
         if (res && res.results && res.results[0]) {
           let data = res.results[0]
           commit('setBlog', data)
-          commit('setAuthor', {avatar: data.avatar || '', nickname: data.nickname || ''})
+          commit('setAuthor', {avatar: data.avatar || '', nickname: data.nickname || '', userid: data.userid})
           commit('setShowDelete', data.userid === rootState.userInfo.objectId)
           dispatch('viewLikes', {likeid: data.likeid})
           dispatch('viewCommons', {commentid: data.commentid})
@@ -93,7 +93,7 @@ const actions = {
   async viewLikes ({ commit, rootState }, options) {
     try {
       let res = await Request.get(`${API.likesAPI}/${options.likeid}`)
-      if (res && res.users && res.users.length > 0) {
+      if (res && res.users) {
         commit('setLikeList', res.users)
         let bol = false
         for (let i = 0; i < res.users.length; i++) {
@@ -109,20 +109,22 @@ const actions = {
       return false
     }
   },
-  async likeBlog ({ state, dispatch }, options) {
+  async likeBlog ({ state, dispatch, rootState }, options) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
       await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [options]}})
+      await Request.put(`${API.userAPI}/${state.blogData.userid}`, {like: {'__op': 'Increment', 'amount': 1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
       return false
     }
   },
-  async unlikeBlog ({ state, dispatch }, options) {
+  async unlikeBlog ({ state, dispatch, rootState }, options) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
       await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [options]}})
+      await Request.put(`${API.userAPI}/${state.blogData.userid}`, {like: {'__op': 'Increment', 'amount': -1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {

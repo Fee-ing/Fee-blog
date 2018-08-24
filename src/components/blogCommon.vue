@@ -10,9 +10,9 @@
     <div class="blog-footer">
       <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
       <div class="blog-info">
-        <div class="info-item"><span>喜欢</span>{{blogData.like}}</div>
-        <div class="info-item"><span>评论</span>{{blogData.comment}}</div>
-        <div class="info-item"><span>浏览</span>{{blogData.view}}</div>
+        <div class="info-item"><span>喜欢</span>{{blogData.like || 0}}</div>
+        <div class="info-item"><span>评论</span>{{blogData.comment || 0}}</div>
+        <div class="info-item"><span>浏览</span>{{blogData.view || 0}}</div>
       </div>
     </div>
   </div>
@@ -42,7 +42,10 @@ export default {
   methods: {
     formatTime,
     viewOpt () {
-      this.$emit('view-blog', this.blogData)
+      let blogid = this.blogData.objectId || ''
+      if (blogid) {
+        this.$router.push({path: '/blog', query: {blogid}})
+      }
     }
   }
 }

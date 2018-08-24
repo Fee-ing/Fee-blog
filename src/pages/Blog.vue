@@ -17,7 +17,7 @@
         <div class="blog-info" v-if="type === '2'">
           <div class="blog-options">
             <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
-            <div class="blog-view">浏览 {{blogData.view}} 次</div>
+            <div class="blog-view">浏览 {{blogData.view || 0}} 次</div>
             <div class="favor-btn common-btn" @click="likeOpt">{{likeData.isLiked ? '已' : ''}}喜欢</div>
           </div>
           <div class="blog-likes blog-common" v-if="likeData.list.length > 0">
@@ -180,14 +180,10 @@ export default {
       let params = {
         params1: {
           cover: blogInfo.cover,
-          paragraph: blogInfo.paragraph,
-          like: 0,
-          comment: 0,
-          view: 0
+          paragraph: blogInfo.paragraph
         },
         params2: {
-          content: blog,
-          view: 0
+          content: blog
         },
         user: {
           userid: this.userInfo.objectId,

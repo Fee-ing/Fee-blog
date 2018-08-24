@@ -16,9 +16,7 @@
     </div>
     <div class="page-body">
       <div class="page-body-content">
-        <template v-for="(item, index) in blogList">
-          <blogCommon :key="index" :blogData="item" @view-blog="viewOpt"></blogCommon>
-        </template>
+        <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item"></blogCommon>
       </div>
     </div>
   </div>
@@ -59,10 +57,6 @@ export default {
     },
     logoutOpt () {
       this.logout()
-    },
-    viewOpt (opts) {
-      let blogid = opts.objectId
-      this.$router.push({path: '/blog', query: {blogid}})
     }
   }
 }
@@ -83,6 +77,7 @@ export default {
     cursor: pointer;
     margin-right: 10px;
     .user-info .user-logout{
+      color: @gray;
       font-size: 11px;
       transition: all 0.3s;
       &:hover{

@@ -5,6 +5,7 @@ import actions from './actions'
 import mutations from './mutations'
 import home from './modules/home'
 import blog from './modules/blog'
+import user from './modules/user'
 
 import { getCookie } from '../plugins/func'
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
   mutations,
   modules: {
     home,
-    blog
+    blog,
+    user
   }
 })

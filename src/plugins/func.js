@@ -53,7 +53,8 @@ export function delStorage (name) {
   setStorage(name, '')
 }
 
-export function formatTime (time) {
+export function formatTime (time, type) {
+  let _type = type || '1'
   let date = new Date(time)
   let now = new Date()
   let Y, M, D, h, m, s
@@ -71,6 +72,10 @@ export function formatTime (time) {
   _h = parseInt(now.getHours())
   _m = parseInt(now.getMinutes())
   _s = parseInt(now.getSeconds())
+
+  if (_type === '2') {
+    return `${Y}年${M}月${D}号 ${h}点${m}分`
+  }
 
   if (_Y - Y > 1) {
     return (_Y - Y) + '年前' + M + '月' + D + '号' + h + '点'

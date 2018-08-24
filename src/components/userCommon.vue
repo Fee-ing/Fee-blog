@@ -1,5 +1,5 @@
 <template>
-  <div class="user-wrapper">
+  <div class="user-wrapper" @click.stop="viewUserOpt">
     <div class="user-avatar background-image" v-if="userInfo.avatar" :style="{ backgroundImage: 'url(' + userInfo.avatar + ')'}"></div>
     <div class="user-avatar background-image user-avatar-default" v-else></div>
     <div class="user-info">
@@ -24,6 +24,12 @@ export default {
     }
   },
   methods: {
+    viewUserOpt () {
+      let userid = this.userInfo.userid || ''
+      if (userid) {
+        this.$router.push({path: '/user', query: {userid}})
+      }
+    }
   }
 }
 </script>
@@ -33,6 +39,7 @@ export default {
 .user-wrapper{
   display: flex;
   align-items: center;
+  cursor: pointer;
   &.small-avatar{
     .user-avatar{
       width: 25px;
