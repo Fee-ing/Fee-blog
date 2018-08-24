@@ -2,6 +2,9 @@
 
 > Fee-blog2.0
 
+## 在线预览
+在线预览地址： [搭建免费博客](https://fee-ing.github.io/Fee-blog)
+
 ## Build Setup
 
 ``` bash

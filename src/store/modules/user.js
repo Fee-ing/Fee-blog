@@ -28,7 +28,6 @@ const actions = {
       commit('initData')
       let bol = false
       let config = {params: {keys: '-email,-username'}}
-      console.log(rootState.userInfo)
       if (options.userid === rootState.userInfo.objectId) {
         bol = true
         config = {}
