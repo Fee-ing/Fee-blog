@@ -210,6 +210,12 @@ export default {
       }
     },
     likeOpt () {
+      if (!this.userInfo) {
+        this.$toast({
+          title: '请先登录'
+        })
+        return
+      }
       let params = {
         userid: this.userInfo.objectId,
         nickname: this.userInfo.nickname,
@@ -222,6 +228,12 @@ export default {
       }
     },
     async commentOpt () {
+      if (!this.userInfo) {
+        this.$toast({
+          title: '请先登录'
+        })
+        return
+      }
       let comment = this.commentContent.replace(/(^\s*)|(\s*$)/, '')
       if (comment === '') {
         return
