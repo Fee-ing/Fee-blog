@@ -36,9 +36,6 @@ const actions = {
       let res = await Request.get(`${API.userAPI}/${options.userid}`, config)
       if (res) {
         commit('setUserData', res)
-        if (bol) {
-          commit('setUserInfo', res, {root: true})
-        }
       }
       return true
     } catch (error) {

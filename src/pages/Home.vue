@@ -16,7 +16,7 @@
     </div>
     <div class="page-body">
       <div class="page-body-content">
-        <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item"></blogCommon>
+        <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item" :showSign="true"></blogCommon>
       </div>
     </div>
   </div>

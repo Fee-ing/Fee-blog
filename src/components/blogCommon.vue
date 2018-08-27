@@ -1,7 +1,7 @@
 <template>
   <div class="blog-wrapper" @click.stop="viewOpt">
     <div class="blog-header">
-      <userCommon :userInfo="blogData.user" class="blog-user"></userCommon>
+      <userCommon :userInfo="blogData.user" :showSign="showSign" class="blog-user"></userCommon>
     </div>
     <div class="blog-body">
       <div v-if="blogData.cover" class="blog-cover background-image" :style="{ backgroundImage: 'url(' + blogData.cover + ')'}"></div>
@@ -30,6 +30,10 @@ export default {
       default: () => {
         return {}
       }
+    },
+    showSign: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

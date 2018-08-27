@@ -4,6 +4,7 @@
     <div class="user-avatar background-image user-avatar-default" v-else></div>
     <div class="user-info">
       <div class="user-name">{{userInfo.nickname}}</div>
+      <div class="info-item" v-if="showSign && userInfo.sign">{{userInfo.sign}}</div>
       <slot name="user-others"></slot>
     </div>
   </div>
@@ -17,6 +18,10 @@ export default {
       default: () => {
         return {}
       }
+    },
+    showSign: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
