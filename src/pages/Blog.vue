@@ -292,7 +292,7 @@ export default {
             display: inline-block;
             height: 25px;
             margin-top: 10px;
-            margin-left: 10px;
+            margin-left: 15px;
             &:first-child{
               margin-left: 0;
             }

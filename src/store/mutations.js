@@ -4,7 +4,7 @@ export default {
   setUserInfo (state, data) {
     let userInfo = state.userInfo ? JSON.parse(JSON.stringify(state.userInfo)) : {}
     state.userInfo = Object.assign(userInfo, data)
-    setCookie('Blog_userInfo', JSON.stringify({objectId: state.userInfo.objectId}))
+    setCookie('Blog_userInfo', JSON.stringify({objectId: state.userInfo.objectId, sessionToken: state.userInfo.sessionToken}))
   },
   clearUserInfo (state) {
     state.userInfo = null

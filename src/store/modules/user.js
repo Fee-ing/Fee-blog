@@ -42,13 +42,15 @@ const actions = {
       return false
     }
   },
-  async viewBlog ({ commit, rootState }, options) {
+  async viewBlog ({ dispatch, commit }, options) {
     try {
       let res = await Request.get(`${API.blogListAPI}`, {params: {where: {userid: options.userid}}})
       if (res && res.results) {
-        res.results.forEach(element => {
-          element.user = rootState.userInfo
-        })
+        for (let i = 0; i < res.results.length; i++) {
+          const element = res.results[i]
+          let userRes = await dispatch('getUser', {userid: element.userid}, {root: true})
+          element.user = userRes || {}
+        }
         commit('setBlogList', res.results)
       }
       return true

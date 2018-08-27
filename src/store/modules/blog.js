@@ -116,8 +116,8 @@ const actions = {
   async likeBlog ({ state, dispatch, rootState }) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
-      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [state.blogData.userid]}})
-      await Request.put(`${API.userAPI}/${state.blogData.userid}`, {like: {'__op': 'Increment', 'amount': 1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
+      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, {like: {'__op': 'Increment', 'amount': 1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
@@ -127,8 +127,8 @@ const actions = {
   async unlikeBlog ({ state, dispatch, rootState }) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
-      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [state.blogData.userid]}})
-      await Request.put(`${API.userAPI}/${state.blogData.userid}`, {like: {'__op': 'Increment', 'amount': -1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
+      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, {like: {'__op': 'Increment', 'amount': -1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
