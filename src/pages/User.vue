@@ -10,8 +10,12 @@
       <div class="page-body-content">
         <div class="user-header">
           <div class="left">
-            <div class="avatar background-image" v-if="userData.avatar" :style="{ backgroundImage: 'url(' + userData.avatar + ')'}"></div>
-            <div class="avatar background-image avatar-default" v-else></div>
+            <div class="left-avatar">
+              <div class="avatar background-image" v-if="userData.avatar" :style="{ backgroundImage: 'url(' + userData.avatar + ')'}"></div>
+              <div class="avatar background-image avatar-default" v-else></div>
+              <input v-if="type === '2'" type="file" accept="*.png,*.jpg,*.jpeg,*gif" class="avatar-input" @change.stop="updateAvatar">
+              <div v-if="type === '2'" class="tip">更换头像</div>
+            </div>
             <div class="name">
               <span v-if="type === '1'">{{userData.nickname}}</span>
               <input v-else type="text" placeholder="8字以内" v-model="userData.nickname">
@@ -70,6 +74,7 @@
 <script>
 import blogCommon from '../components/blogCommon.vue'
 
+import lrz from 'lrz'
 import { formatTime } from '../plugins/func'
 
 import { createNamespacedHelpers } from 'vuex'
@@ -97,8 +102,16 @@ export default {
     editOpt () {
       this.type = '2'
     },
+    updateAvatar () {
+      lrz(event.currentTarget.files[0]).then((rst) => {
+        this.userData.avatar = rst.base64
+      }).catch(() => {
+        this.$toast('图片上传失败')
+      })
+    },
     async saveOpt () {
       let params = {
+        avatar: this.userData.avatar || '',
         nickname: (this.userData.nickname || '').replace(/\s/gi, ''),
         location: (this.userData.location || '').replace(/\s/gi, ''),
         qq: (this.userData.qq || '').replace(/\s/gi, ''),
@@ -182,12 +195,48 @@ export default {
       justify-content: center;
       padding: 0 50px;
       margin-right: 30px;
-      .avatar{
+      .left-avatar{
+        position: relative;
         width: 60px;
         height: 60px;
         border-radius: 4px;
-        &.avatar-default{
-          background-image: url(../assets/images/default-avatar.png);
+        overflow: hidden;
+        &:hover{
+          .tip{
+            bottom: 0;
+          }
+        }
+        .avatar{
+          position: relative;
+          z-index: 1;
+          height: 100%;
+          &.avatar-default{
+            background-image: url(../assets/images/default-avatar.png);
+          }
+        }
+        .avatar-input{
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          left: 0;
+          top: 0;
+          z-index: 10;
+          cursor: pointer;
+        }
+        .tip{
+          position: absolute;
+          width: 100%;
+          height: 20px;
+          line-height: 20px;
+          background-color: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          text-align: center;
+          font-size: 11px;
+          left: 0;
+          bottom: -100%;
+          z-index: 5;
+          transition: bottom 0.3s;
         }
       }
       .name{

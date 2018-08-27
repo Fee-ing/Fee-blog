@@ -41,7 +41,7 @@
               <div class="comments-list">
                 <div class="comments-item" v-for="(item, index) in comments" :key="index">
                   <div class="comments-user">
-                    <userCommon :userInfo="item" class="small-avatar"></userCommon>
+                    <userCommon :userInfo="item.user" class="small-avatar"></userCommon>
                     <div class="comments-time">{{formatTime(item.time)}}</div>
                   </div>
                   <div class="comments-detail">{{item.comment}}</div>
@@ -180,15 +180,12 @@ export default {
       let params = {
         params1: {
           cover: blogInfo.cover,
-          paragraph: blogInfo.paragraph
+          paragraph: blogInfo.paragraph,
+          userid: this.userInfo.objectId
         },
         params2: {
-          content: blog
-        },
-        user: {
-          userid: this.userInfo.objectId,
-          nickname: this.userInfo.nickname,
-          avatar: this.userInfo.avatar || ''
+          content: blog,
+          userid: this.userInfo.objectId
         }
       }
       if (this.type === '1') {
@@ -216,15 +213,10 @@ export default {
         })
         return
       }
-      let params = {
-        userid: this.userInfo.objectId,
-        nickname: this.userInfo.nickname,
-        avatar: this.userInfo.avatar || ''
-      }
       if (this.likeData.isLiked) {
-        this.unlikeBlog(params)
+        this.unlikeBlog()
       } else {
-        this.likeBlog(params)
+        this.likeBlog()
       }
     },
     async commentOpt () {
@@ -246,8 +238,6 @@ export default {
       }
       let params = {
         userid: this.userInfo.objectId,
-        nickname: this.userInfo.nickname,
-        avatar: this.userInfo.avatar || '',
         comment,
         time: new Date()
       }

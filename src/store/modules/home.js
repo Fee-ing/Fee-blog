@@ -12,7 +12,7 @@ const getters = {
 }
 
 const actions = {
-  async getBlogList ({ commit }) {
+  async getBlogList ({ dispatch, commit }) {
     try {
       let config = {
         params: {
@@ -24,6 +24,11 @@ const actions = {
       }
       let res = await Request.get(API.blogListAPI, config)
       if (res && res.results) {
+        for (let i = 0; i < res.results.length; i++) {
+          const element = res.results[i]
+          let userRes = await dispatch('getUser', {userid: element.userid}, {root: true})
+          element.user = userRes || {}
+        }
         commit('setBlogList', res.results)
       }
       return res

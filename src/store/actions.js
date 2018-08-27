@@ -22,5 +22,13 @@ export default {
   },
   logout ({ commit }) {
     commit('clearUserInfo')
+  },
+  async getUser ({ commit }, options) {
+    try {
+      let res = await Request.get(`${API.userAPI}/${options.userid}`, {params: {keys: 'nickname,avatar,sign,location'}})
+      return res
+    } catch (error) {
+      return {}
+    }
   }
 }
