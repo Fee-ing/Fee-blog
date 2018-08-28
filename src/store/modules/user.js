@@ -32,7 +32,7 @@ const getters = {
 }
 
 const actions = {
-  async viewUser ({ commit, rootState }, options) {
+  async getUser ({ commit, rootState }, options) {
     try {
       commit('initData')
       let bol = false
@@ -60,6 +60,11 @@ const actions = {
           skip: 0,
           count: 1
         }
+      }
+      if (options.blogType === '1') {
+        config.params.where = {userid: options.userid}
+      } else if (options.blogType === '2') {
+        config.params.where = {collects: options.userid}
       }
       if (options.pageDown) {
         config.params.limit = (state.pageData.page + 1) * state.pageData.per
@@ -95,7 +100,7 @@ const actions = {
   async updateUser ({ dispatch, rootState }, options) {
     try {
       await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, options, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
-      await dispatch('viewUser', {userid: rootState.userInfo.objectId})
+      await dispatch('getUser', {userid: rootState.userInfo.objectId})
       return true
     } catch (error) {
       return false

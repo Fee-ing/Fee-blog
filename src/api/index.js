@@ -6,6 +6,7 @@ export const API = {
   blogsAPI: `${baseAPI}/1.1/classes/blogs`,
   likesAPI: `${baseAPI}/1.1/classes/likes`,
   commentsAPI: `${baseAPI}/1.1/classes/comments`,
+  collectsAPI: `${baseAPI}/1.1/classes/collects`,
   userAPI: `${baseAPI}/1.1/users`,
   loginAPI: `${baseAPI}/1.1/login`
 }

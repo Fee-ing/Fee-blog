@@ -76,6 +76,9 @@ export default {
     },
     logoutOpt () {
       this.logout()
+      this.$toast({
+        title: '退出成功'
+      })
     }
   }
 }

@@ -67,6 +67,10 @@ input, textarea{
   background-size: cover;
 }
 
+.shadow{
+  box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.4), inset 0 -3px 4px -1px rgba(0, 0, 0, 0.2), 0 -10px 15px -1px rgba(255, 255, 255, 0.6), inset 0 3px 4px -1px rgba(255, 255, 255, 0.2), inset 0 0 5px 1px rgba(255, 255, 255, 0.8), inset 0 20px 30px 0 rgba(255, 255, 255, 0.2);
+}
+
 html, body, #app{
   position: relative;
   height: 100%;
@@ -85,8 +89,8 @@ html, body, #app{
     position: fixed;
     width: 100%;
     height: 50px;
-    box-shadow: 0 2px 4px hsla(0,0%,8%,.15);
     background: @white-gray;
+    border-bottom: 1px solid #ccc;
     z-index: 10000;
     .back-btn{
       position: absolute;
@@ -100,15 +104,21 @@ html, body, #app{
       display: flex;
       align-items: center;
       margin: 0 auto;
+      .page-header-title{
+        flex: 1;
+        font-size: 15px;
+        font-weight: bold;
+        text-align: center;
+      }
     }
   }
   .page-body{
     width: @WIDTH;
     min-height: 100%;
     margin: 0 auto;
-    background-color: #fff;
+    background: #fff;
     padding-top: 50px;
-    box-shadow: 0 0 10px rgba(0,0,0,.25);
+    .shadow;
     .page-body-content{
       padding: 30px;
       .page-tip{
@@ -122,9 +132,6 @@ html, body, #app{
 .blog-wrapper{
   cursor: pointer;
   margin-bottom: 50px;
-  .blog-header{
-
-  }
   .blog-body{
     display: flex;
     margin-top: 10px;

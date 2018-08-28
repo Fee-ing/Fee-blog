@@ -9,6 +9,10 @@ const state = {
     list: [],
     isLiked: false
   },
+  collectData: {
+    list: [],
+    isCollected: false
+  },
   comments: []
 }
 
@@ -27,6 +31,9 @@ const getters = {
   },
   likeData: (state) => {
     return state.likeData
+  },
+  collectData: (state) => {
+    return state.collectData
   },
   comments: (state) => {
     return state.comments.reverse()
@@ -49,6 +56,7 @@ const actions = {
           commit('setShowDelete', (rootState.userInfo && data.userid === rootState.userInfo.objectId))
           dispatch('viewLikes', {likeid: data.likeid})
           dispatch('viewCommons', {commentid: data.commentid})
+          dispatch('viewCollects', {collectid: data.collectid})
         }
       }
       return true
@@ -61,7 +69,8 @@ const actions = {
       let listRes = await Request.post(API.blogListAPI, Object.assign({}, options.params1, {type: '1'}))
       let likeRes = await Request.post(API.likesAPI, {blogid: listRes.objectId, users: []})
       let commentRes = await Request.post(API.commentsAPI, {blogid: listRes.objectId, comments: []})
-      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', blogid: listRes.objectId, likeid: likeRes.objectId, commentid: commentRes.objectId}))
+      let collectRes = await Request.post(API.collectsAPI, {blogid: listRes.objectId, users: []})
+      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', blogid: listRes.objectId, likeid: likeRes.objectId, commentid: commentRes.objectId, collectid: collectRes.objectId}))
       return true
     } catch (error) {
       return false
@@ -82,6 +91,7 @@ const actions = {
       await Request.delete(`${API.blogsAPI}/${state.blogData.objectId}`)
       await Request.delete(`${API.likesAPI}/${state.blogData.likeid}`)
       await Request.delete(`${API.commentsAPI}/${state.blogData.commentid}`)
+      await Request.delete(`${API.collectsAPI}/${state.blogData.collectid}`)
       return true
     } catch (error) {
       return false
@@ -117,7 +127,6 @@ const actions = {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
       await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
-      await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, {like: {'__op': 'Increment', 'amount': 1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
@@ -128,7 +137,6 @@ const actions = {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
       await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
-      await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, {like: {'__op': 'Increment', 'amount': -1}}, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
       dispatch('viewLikes', {likeid: state.blogData.likeid})
       return true
     } catch (error) {
@@ -160,6 +168,48 @@ const actions = {
     } catch (error) {
       return false
     }
+  },
+  async viewCollects ({ dispatch, commit, rootState }, options) {
+    try {
+      let res = await Request.get(`${API.collectsAPI}/${options.collectid}`)
+      if (res && res.users) {
+        let collectors = []
+        let bol = false
+        for (let i = 0; i < res.users.length; i++) {
+          const element = res.users[i]
+          if (rootState.userInfo && element === rootState.userInfo.objectId) {
+            bol = true
+          }
+          let userRes = await dispatch('getUser', {userid: element}, {root: true})
+          collectors.push(userRes || {})
+        }
+        commit('setCollectList', collectors)
+        commit('setIsCollected', bol)
+      }
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async collectBlog ({ state, dispatch, rootState }) {
+    try {
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collects: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
+      dispatch('viewCollects', {collectid: state.blogData.collectid})
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async uncollectBlog ({ state, dispatch, rootState }) {
+    try {
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collects: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
+      dispatch('viewCollects', {collectid: state.blogData.collectid})
+      return true
+    } catch (error) {
+      return false
+    }
   }
 }
 
@@ -171,6 +221,10 @@ const mutations = {
     state.likeData = {
       list: [],
       isLiked: false
+    }
+    state.collectData = {
+      list: [],
+      isCollected: false
     }
     state.comments = []
   },
@@ -191,6 +245,12 @@ const mutations = {
   },
   setComments (state, list) {
     state.comments = list
+  },
+  setCollectList (state, list) {
+    state.collectData.list = list
+  },
+  setIsCollected (state, bol) {
+    state.collectData.isCollected = bol
   }
 }
 

@@ -4,6 +4,7 @@
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
         <edit-header v-if="type === '1' || showDelete" :showDelete="showDelete"  @add-img="addImg" @clear-html="clearOpt" @deltet-blog="deleteOpt" @add-blog="submitOpt"></edit-header>
+        <div v-else-if="author" class="page-header-title">{{author.nickname}}的博客</div>
       </div>
     </div>
     <div class="page-body">
@@ -19,11 +20,22 @@
             <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
             <div class="blog-view">浏览 {{blogData.view || 0}} 次</div>
             <div class="favor-btn common-btn" @click="likeOpt">{{likeData.isLiked ? '已' : ''}}喜欢</div>
+            <div v-if="blogData.userid !== userInfo.objectId" class="favor-btn common-btn" @click="collectOpt">{{collectData.isCollected ? '已' : ''}}收藏</div>
           </div>
           <div class="blog-likes blog-common" v-if="likeData.list.length > 0">
             <div class="title">喜欢（{{likeData.list.length}}人）：</div>
             <div class="likes-conent">
               <div class="likes-item" v-for="(item, index) in likeData.list" :key="index">
+                <div class="likes-info">
+                  <userCommon :userInfo="item" class="small-avatar"></userCommon>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="blog-likes blog-common" v-if="collectData.list.length > 0">
+            <div class="title">收藏（{{collectData.list.length}}人）：</div>
+            <div class="likes-conent">
+              <div class="likes-item" v-for="(item, index) in collectData.list" :key="index">
                 <div class="likes-info">
                   <userCommon :userInfo="item" class="small-avatar"></userCommon>
                 </div>
@@ -94,10 +106,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData', 'comments'])
+    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData', 'collectData', 'comments'])
   },
   methods: {
-    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'commentBlog']),
+    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'commentBlog', 'uncollectBlog', 'collectBlog']),
     formatTime,
     insertHtmlAtCaret (str) {
       let sel, range
@@ -217,6 +229,19 @@ export default {
         this.unlikeBlog()
       } else {
         this.likeBlog()
+      }
+    },
+    collectOpt () {
+      if (!this.userInfo) {
+        this.$toast({
+          title: '请先登录'
+        })
+        return
+      }
+      if (this.collectData.isCollected) {
+        this.uncollectBlog()
+      } else {
+        this.collectBlog()
       }
     },
     async commentOpt () {

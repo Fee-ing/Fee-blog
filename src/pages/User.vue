@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
-        <div class="user-name">{{isAuthor ? '我' : userData.nickname}}的主页</div>
+        <div class="page-header-title">{{isAuthor ? '我' : userData.nickname}}的主页</div>
       </div>
     </div>
     <div class="page-body">
@@ -60,10 +60,16 @@
                 <textarea v-else cols="30" rows="2" placeholder="选填，不超过30个字" v-model="userData.sign"></textarea>
               </div>
             </div>
-            <div class="right-item regist-time">注册时间：<span>{{formatTime(userData.createdAt, '2')}}</span></div>
           </div>
         </div>
         <div class="user-body">
+          <div class="user-body-header">
+            <div class="btn-wrapper">
+              <div class="common-btn" :class="[blogType === '1' ? 'active' : '']" @click="changeBolgType('1')">{{isAuthor ? '我' : '他'}}发布的</div>
+              <div class="common-btn" :class="[blogType === '2' ? 'active' : '']" @click="changeBolgType('2')">{{isAuthor ? '我' : '他'}}收藏的</div>
+            </div>
+            <div class="info-wrapper">{{formatTime(userData.createdAt, '2')}} 注册</div>
+          </div>
           <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item"></blogCommon>
         </div>
         <div class="page-tip">
@@ -89,6 +95,7 @@ export default {
   data () {
     return {
       type: '1',
+      blogType: '1',
       isLoading: false
     }
   },
@@ -98,25 +105,35 @@ export default {
   computed: {
     ...mapGetters(['userInfo', 'isAuthor', 'userData', 'blogList', 'isEnding'])
   },
-  async created () {
-    this.isLoading = true
-    await this.viewUser({userid: this.$route.query.userid})
-    await this.viewBlog({userid: this.$route.query.userid})
-    this.isLoading = false
+  watch: {
+    '$route' () {
+      this.getData()
+    }
+  },
+  created () {
+    this.getData()
   },
   mounted () {
     let that = this
     document.querySelector('.page-wrapper').addEventListener('scroll', async (e) => {
       if (e.target.offsetHeight + e.target.scrollTop + 100 >= e.target.scrollHeight && !that.isLoading && !that.isEnding) {
         that.isLoading = true
-        await that.viewBlog({userid: this.$route.query.userid, pageDown: true})
+        await that.viewBlog({userid: that.$route.query.userid, blogType: that.blogType, pageDown: true})
         that.isLoading = false
       }
     })
   },
   methods: {
-    ...mapActions(['viewUser', 'viewBlog', 'updateUser']),
+    ...mapActions(['getUser', 'viewBlog', 'updateUser']),
     formatTime,
+    async getData () {
+      this.type = '1'
+      this.blogType = '1'
+      this.isLoading = true
+      await this.getUser({userid: this.$route.query.userid})
+      await this.viewBlog({userid: this.$route.query.userid, blogType: this.blogType})
+      this.isLoading = false
+    },
     editOpt () {
       this.type = '2'
     },
@@ -189,6 +206,12 @@ export default {
         })
       }
       await this.viewBlog({userid: this.$route.query.userid})
+    },
+    async changeBolgType (type) {
+      this.isLoading = true
+      this.blogType = type
+      await this.viewBlog({userid: this.$route.query.userid, blogType: this.blogType})
+      this.isLoading = false
     }
   }
 }
@@ -197,12 +220,6 @@ export default {
 <style lang="less" scoped>
 @import '../assets/css/color.less';
 .user-wrapper{
-  .user-name{
-    flex: 1;
-    font-size: 15px;
-    font-weight: bold;
-    text-align: center;
-  }
   .user-header{
     display: flex;
     .left{
@@ -286,12 +303,7 @@ export default {
         line-height: 26px;
         display: flex;
         align-items: center;
-        margin-bottom: 5px;
-        &.regist-time{
-          margin-bottom: 0;
-          margin-top: 15px;
-          font-size: 11px;
-        }
+        margin-top: 5px;
         .right-title{
           width: 40px;
         }
@@ -320,6 +332,27 @@ export default {
   }
   .user-body{
     margin-top: 50px;
+    .user-body-header{
+      display: flex;
+      align-items: center;
+      margin-bottom: 50px;
+      .btn-wrapper{
+        flex: 1;
+        display: flex;
+        .common-btn{
+          margin-left: 0;
+          margin-right: 15px;
+          background-color: @gray;
+          &.active{
+            background-color: @black;
+          }
+        }
+      }
+      .info-wrapper{
+        font-size: 11px;
+        color: @gray;
+      }
+    }
   }
 }
 </style>
