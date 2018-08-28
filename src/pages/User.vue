@@ -66,6 +66,11 @@
         <div class="user-body">
           <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item"></blogCommon>
         </div>
+        <div class="page-tip">
+          <span v-if="isEnding">没有更多啦~</span>
+          <span v-else-if="!isEnding && isLoading">加载中~</span>
+          <span v-else-if="!isEnding && !isLoading && blogList.length <= 0">这里什么也没有~</span>
+        </div>
       </div>
     </div>
   </div>
@@ -83,18 +88,31 @@ const { mapGetters, mapActions } = createNamespacedHelpers('user')
 export default {
   data () {
     return {
-      type: '1'
+      type: '1',
+      isLoading: false
     }
   },
   components: {
     blogCommon
   },
+  computed: {
+    ...mapGetters(['userInfo', 'isAuthor', 'userData', 'blogList', 'isEnding'])
+  },
   async created () {
+    this.isLoading = true
     await this.viewUser({userid: this.$route.query.userid})
     await this.viewBlog({userid: this.$route.query.userid})
+    this.isLoading = false
   },
-  computed: {
-    ...mapGetters(['userInfo', 'isAuthor', 'userData', 'blogList'])
+  mounted () {
+    let that = this
+    document.querySelector('.page-wrapper').addEventListener('scroll', async (e) => {
+      if (e.target.offsetHeight + e.target.scrollTop + 100 >= e.target.scrollHeight && !that.isLoading && !that.isEnding) {
+        that.isLoading = true
+        await that.viewBlog({userid: this.$route.query.userid, pageDown: true})
+        that.isLoading = false
+      }
+    })
   },
   methods: {
     ...mapActions(['viewUser', 'viewBlog', 'updateUser']),

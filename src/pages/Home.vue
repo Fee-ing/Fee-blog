@@ -17,6 +17,11 @@
     <div class="page-body">
       <div class="page-body-content">
         <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item" :showSign="true"></blogCommon>
+        <div class="page-tip">
+          <span v-if="isEnding">没有更多啦~</span>
+          <span v-else-if="!isEnding && isLoading">加载中~</span>
+          <span v-else-if="!isEnding && !isLoading && blogList.length <= 0">这里什么也没有~</span>
+        </div>
       </div>
     </div>
   </div>
@@ -32,6 +37,7 @@ export default {
   name: 'Home',
   data () {
     return {
+      isLoading: false
     }
   },
   components: {
@@ -41,11 +47,24 @@ export default {
   computed: {
     ...mapGetters({
       blogList: 'home/blogList',
+      isEnding: 'home/isEnding',
       userInfo: 'userInfo'
     })
   },
-  created () {
-    this.getBlogList()
+  async created () {
+    this.isLoading = true
+    await this.getBlogList()
+    this.isLoading = false
+  },
+  mounted () {
+    let that = this
+    document.querySelector('.page-wrapper').addEventListener('scroll', async (e) => {
+      if (e.target.offsetHeight + e.target.scrollTop + 100 >= e.target.scrollHeight && !that.isLoading && !that.isEnding) {
+        that.isLoading = true
+        await that.getBlogList({pageDown: true})
+        that.isLoading = false
+      }
+    })
   },
   methods: {
     ...mapActions({

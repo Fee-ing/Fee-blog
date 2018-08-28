@@ -46,7 +46,7 @@ const actions = {
           let userRes = await dispatch('getUser', {userid: data.userid}, {root: true})
           commit('setBlog', data)
           commit('setAuthor', (userRes || {}))
-          commit('setShowDelete', data.userid === rootState.userInfo.objectId)
+          commit('setShowDelete', (rootState.userInfo && data.userid === rootState.userInfo.objectId))
           dispatch('viewLikes', {likeid: data.likeid})
           dispatch('viewCommons', {commentid: data.commentid})
         }
@@ -99,7 +99,7 @@ const actions = {
         let bol = false
         for (let i = 0; i < res.users.length; i++) {
           const element = res.users[i]
-          if (element === rootState.userInfo.objectId) {
+          if (rootState.userInfo && element === rootState.userInfo.objectId) {
             bol = true
           }
           let userRes = await dispatch('getUser', {userid: element}, {root: true})
