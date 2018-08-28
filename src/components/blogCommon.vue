@@ -75,10 +75,6 @@ export default {
       .paragraph{
         display: inline-block;
       }
-      .blog-more{
-        color: @gray;
-        font-size: 12px;
-      }
     }
   }
   .blog-footer{
