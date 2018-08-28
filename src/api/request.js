@@ -4,12 +4,6 @@ import { toast } from '../plugins/func'
 import axios from 'axios'
 import MD5 from 'md5'
 
-import AV from 'leancloud-storage'
-AV.init({
-  appId: APPINFO.appId,
-  appKey: APPINFO.appKey
-})
-
 let timestamp = new Date().getTime()
 
 let axiosIns = axios.create({

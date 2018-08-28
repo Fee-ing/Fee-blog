@@ -12,10 +12,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "leancloud-storage": "^3.10.0",
     "lrz": "^4.9.40",
     "md5": "^2.2.1",
-    "qs": "^6.5.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
