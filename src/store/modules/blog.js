@@ -64,13 +64,14 @@ const actions = {
       return false
     }
   },
-  async createBlog ({ commit }, options) {
+  async createBlog ({ rootState }, options) {
     try {
-      let listRes = await Request.post(API.blogListAPI, Object.assign({}, options.params1, {type: '1'}))
-      let likeRes = await Request.post(API.likesAPI, {blogid: listRes.objectId, users: []})
-      let commentRes = await Request.post(API.commentsAPI, {blogid: listRes.objectId, comments: []})
-      let collectRes = await Request.post(API.collectsAPI, {blogid: listRes.objectId, users: []})
-      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', blogid: listRes.objectId, likeid: likeRes.objectId, commentid: commentRes.objectId, collectid: collectRes.objectId}))
+      let userid = (rootState.userInfo && rootState.userInfo.objectId) || ''
+      let listRes = await Request.post(API.blogListAPI, Object.assign({}, options.params1, {type: '1', userid}))
+      let likeRes = await Request.post(API.likesAPI, {userid, blogid: listRes.objectId, users: []})
+      let commentRes = await Request.post(API.commentsAPI, {userid, blogid: listRes.objectId, comments: []})
+      let collectRes = await Request.post(API.collectsAPI, {userid, blogid: listRes.objectId, users: []})
+      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', userid, blogid: listRes.objectId, likeid: likeRes.objectId, commentid: commentRes.objectId, collectid: collectRes.objectId}))
       return true
     } catch (error) {
       return false
@@ -79,7 +80,7 @@ const actions = {
   async updateBlog ({ state }, options) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, Object.assign({}, options.params1, {type: '2'}))
-      await Request.put(`${API.blogsAPI}/${state.blogData.objectId}`, Object.assign({}, options.params2, {blogid: state.blogData.blogid, type: '2'}))
+      await Request.put(`${API.blogsAPI}/${state.blogData.objectId}`, Object.assign({}, options.params2, {type: '2', blogid: state.blogData.blogid}))
       return true
     } catch (error) {
       return false
@@ -193,7 +194,7 @@ const actions = {
   },
   async collectBlog ({ state, dispatch, rootState }) {
     try {
-      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collects: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collect: {'__op': 'Increment', 'amount': 1}})
       await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
       dispatch('viewCollects', {collectid: state.blogData.collectid})
       return true
@@ -203,7 +204,7 @@ const actions = {
   },
   async uncollectBlog ({ state, dispatch, rootState }) {
     try {
-      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collects: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collect: {'__op': 'Increment', 'amount': -1}})
       await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
       dispatch('viewCollects', {collectid: state.blogData.collectid})
       return true

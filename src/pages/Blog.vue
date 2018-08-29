@@ -193,12 +193,10 @@ export default {
       let params = {
         params1: {
           cover: blogInfo.cover,
-          paragraph: blogInfo.paragraph,
-          userid: this.userInfo.objectId
+          paragraph: blogInfo.paragraph
         },
         params2: {
-          content: blog,
-          userid: this.userInfo.objectId
+          content: blog
         }
       }
       if (this.type === '1') {

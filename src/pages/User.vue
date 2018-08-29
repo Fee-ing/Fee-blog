@@ -74,7 +74,7 @@
         </div>
         <div class="page-tip">
           <span v-if="isEnding">没有更多啦~</span>
-          <span v-else-if="!isEnding && isLoading">加载中~</span>
+          <span v-else-if="!isEnding && isLoading && blogList.length >= 10">加载中~</span>
           <span v-else-if="!isEnding && !isLoading && blogList.length <= 0">这里什么也没有~</span>
         </div>
       </div>

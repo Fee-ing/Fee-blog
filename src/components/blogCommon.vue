@@ -10,6 +10,7 @@
     <div class="blog-footer">
       <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
       <div class="blog-info">
+        <div class="info-item"><span>收藏</span>{{blogData.collect || 0}}</div>
         <div class="info-item"><span>喜欢</span>{{blogData.like || 0}}</div>
         <div class="info-item"><span>评论</span>{{blogData.comment || 0}}</div>
         <div class="info-item"><span>浏览</span>{{blogData.view || 0}}</div>
