@@ -1,4 +1,4 @@
-# blog
+# 搭建免费博客
 
 > Fee-blog2.0
 
@@ -21,4 +21,13 @@ npm run build
 npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## 预览图
+#### 首页
+![首页](https://github.com/Fee-ing/previewImages/blob/master/Fee-blog2.0/home.png)
+#### 博客页
+![首页](https://github.com/Fee-ing/previewImages/blob/master/Fee-blog2.0/blog.png)
+#### 用户主页
+![首页](https://github.com/Fee-ing/previewImages/blob/master/Fee-blog2.0/user.png)
+
+## 项目描述
+[请戳这里](https://fee-ing.github.io/Fee-blog/#/blog?blogid=5b85061cee920a003b83754e)

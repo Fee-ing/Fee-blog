@@ -72,6 +72,7 @@ export default {
     }
     .blog-paragraph{
       flex: 1;
+      text-align: justify;
       .paragraph{
         display: inline-block;
       }

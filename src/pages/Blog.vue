@@ -20,7 +20,7 @@
             <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
             <div class="blog-view">浏览 {{blogData.view || 0}} 次</div>
             <div class="favor-btn common-btn" @click="likeOpt">{{likeData.isLiked ? '已' : ''}}喜欢</div>
-            <div v-if="blogData.userid !== userInfo.objectId" class="favor-btn common-btn" @click="collectOpt">{{collectData.isCollected ? '已' : ''}}收藏</div>
+            <div v-if="!userInfo || blogData.userid !== userInfo.objectId" class="favor-btn common-btn" @click="collectOpt">{{collectData.isCollected ? '已' : ''}}收藏</div>
           </div>
           <div class="blog-likes blog-common" v-if="likeData.list.length > 0">
             <div class="title">喜欢（{{likeData.list.length}}人）：</div>
@@ -95,7 +95,7 @@ export default {
       this.type = '1'
     }
     await this.getBlog({type: this.type, blogid: this.$route.query.blogid || ''})
-    if (this.type === '2' && this.blogData.userid !== this.userInfo.objectId) {
+    if (this.type === '2' && (!this.userInfo || this.blogData.userid !== this.userInfo.objectId)) {
       this.viewBlog()
     }
   },
@@ -284,6 +284,7 @@ export default {
       border: none;
       outline: none;
       padding: 20px 40px;
+      line-height: 18px;
     }
     .blog-info{
       padding: 0 40px;
