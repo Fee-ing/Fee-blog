@@ -2,13 +2,14 @@ const baseAPI = 'https://api.leancloud.cn'
 
 export const API = {
   baseAPI,
+  loginAPI: `${baseAPI}/1.1/login`,
+  userAPI: `${baseAPI}/1.1/users`,
+  userInfoAPI: `${baseAPI}/1.1/classes/userInfo`,
   blogListAPI: `${baseAPI}/1.1/classes/blogList`,
   blogsAPI: `${baseAPI}/1.1/classes/blogs`,
-  likesAPI: `${baseAPI}/1.1/classes/likes`,
-  commentsAPI: `${baseAPI}/1.1/classes/comments`,
   collectsAPI: `${baseAPI}/1.1/classes/collects`,
-  userAPI: `${baseAPI}/1.1/users`,
-  loginAPI: `${baseAPI}/1.1/login`
+  likesAPI: `${baseAPI}/1.1/classes/likes`,
+  commentsAPI: `${baseAPI}/1.1/classes/comments`
 }
 
 export const APPINFO = {

@@ -26,7 +26,8 @@ const actions = {
           order: '-createdAt',
           limit: state.per,
           skip: 0,
-          count: 1
+          count: 1,
+          include: 'user'
         }
       }
       if (options && options.pageDown) {
@@ -41,22 +42,17 @@ const actions = {
         commit('setIsEnding', false)
         commit('setPage', 1)
       }
-      let res = await Request.get(API.blogListAPI, config)
-      if (res && res.results) {
-        commit('setTotal', res.count || 1)
-        if (rootState.userInfo && rootState.userInfo.objectId) {
-          let userInfo = await dispatch('getUser', {userid: rootState.userInfo.objectId}, {root: true})
-          commit('setUserInfo', userInfo, {root: true})
-        }
-        for (let i = 0; i < res.results.length; i++) {
-          const element = res.results[i]
-          let userRes = await dispatch('getUser', {userid: element.userid}, {root: true})
-          element.user = userRes || {}
-        }
+      if (rootState.userInfo && rootState.userInfo.infoId) {
+        let userRes = await Request.get(`${API.userInfoAPI}/${rootState.userInfo.infoId}`, {params: {keys: 'nickname,avatar'}})
+        commit('setUserInfo', {nickname: userRes.nickname, avatar: userRes.avatar}, {root: true})
+      }
+      let blogListRes = await Request.get(API.blogListAPI, config)
+      if (blogListRes && blogListRes.results) {
+        commit('setTotal', blogListRes.count || 1)
         if (options && options.pageDown) {
-          commit('setBlogList', state.blogList.concat(res.results))
+          commit('setBlogList', state.blogList.concat(blogListRes.results))
         } else {
-          commit('setBlogList', res.results)
+          commit('setBlogList', blogListRes.results)
         }
       }
       return true

@@ -3,15 +3,14 @@ import Request from '../../api/request'
 
 const state = {
   blogData: {},
-  author: null,
-  showDelete: false,
-  likeData: {
-    list: [],
-    isLiked: false
-  },
+  isAuthor: false,
   collectData: {
     list: [],
     isCollected: false
+  },
+  likeData: {
+    list: [],
+    isLiked: false
   },
   comments: []
 }
@@ -23,20 +22,17 @@ const getters = {
   blogData: (state) => {
     return state.blogData
   },
-  author: (state) => {
-    return state.author
-  },
-  showDelete: (state) => {
-    return state.showDelete
-  },
-  likeData: (state) => {
-    return state.likeData
+  isAuthor: (state) => {
+    return state.isAuthor
   },
   collectData: (state) => {
     return state.collectData
   },
+  likeData: (state) => {
+    return state.likeData
+  },
   comments: (state) => {
-    return state.comments.reverse()
+    return state.comments
   }
 }
 
@@ -45,15 +41,19 @@ const actions = {
     try {
       commit('initData')
       if (options.type === '1') {
-        commit('setAuthor', rootState.userInfo)
+        commit('setIsAuthor', true)
       } else if (options.type === '2' && options.blogid) {
-        let res = await Request.get(`${API.blogsAPI}`, {params: {where: {blogid: options.blogid}}})
+        let config = {
+          params: {
+            where: {blogid: options.blogid},
+            include: 'user'
+          }
+        }
+        let res = await Request.get(API.blogsAPI, config)
         if (res && res.results && res.results[0]) {
           let data = res.results[0]
-          let userRes = await dispatch('getUser', {userid: data.userid}, {root: true})
           commit('setBlog', data)
-          commit('setAuthor', (userRes || {}))
-          commit('setShowDelete', (rootState.userInfo && data.userid === rootState.userInfo.objectId))
+          commit('setIsAuthor', (rootState.userInfo && data.user.userId === rootState.userInfo.userId))
           dispatch('viewLikes', {likeid: data.likeid})
           dispatch('viewCommons', {commentid: data.commentid})
           dispatch('viewCollects', {collectid: data.collectid})
@@ -66,12 +66,14 @@ const actions = {
   },
   async createBlog ({ rootState }, options) {
     try {
-      let userid = (rootState.userInfo && rootState.userInfo.objectId) || ''
-      let listRes = await Request.post(API.blogListAPI, Object.assign({}, options.params1, {type: '1', userid}))
-      let likeRes = await Request.post(API.likesAPI, {userid, blogid: listRes.objectId, users: []})
-      let commentRes = await Request.post(API.commentsAPI, {userid, blogid: listRes.objectId, comments: []})
-      let collectRes = await Request.post(API.collectsAPI, {userid, blogid: listRes.objectId, users: []})
-      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', userid, blogid: listRes.objectId, likeid: likeRes.objectId, commentid: commentRes.objectId, collectid: collectRes.objectId}))
+      let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+      let user = {
+        '__type': 'Pointer',
+        'className': 'userInfo',
+        'objectId': infoId
+      }
+      let blogListRes = await Request.post(API.blogListAPI, Object.assign({}, options.params1, {type: '1', user}))
+      await Request.post(API.blogsAPI, Object.assign({}, options.params2, {type: '1', user, blogid: blogListRes.objectId}))
       return true
     } catch (error) {
       return false
@@ -80,7 +82,7 @@ const actions = {
   async updateBlog ({ state }, options) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, Object.assign({}, options.params1, {type: '2'}))
-      await Request.put(`${API.blogsAPI}/${state.blogData.objectId}`, Object.assign({}, options.params2, {type: '2', blogid: state.blogData.blogid}))
+      await Request.put(`${API.blogsAPI}/${state.blogData.objectId}`, Object.assign({}, options.params2, {type: '2'}))
       return true
     } catch (error) {
       return false
@@ -90,9 +92,6 @@ const actions = {
     try {
       await Request.delete(`${API.blogListAPI}/${state.blogData.blogid}`)
       await Request.delete(`${API.blogsAPI}/${state.blogData.objectId}`)
-      await Request.delete(`${API.likesAPI}/${state.blogData.likeid}`)
-      await Request.delete(`${API.commentsAPI}/${state.blogData.commentid}`)
-      await Request.delete(`${API.collectsAPI}/${state.blogData.collectid}`)
       return true
     } catch (error) {
       return false
@@ -102,111 +101,214 @@ const actions = {
     await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {view: {'__op': 'Increment', 'amount': 1}})
     await Request.put(`${API.blogsAPI}/${state.blogData.objectId}`, {view: {'__op': 'Increment', 'amount': 1}})
   },
-  async viewLikes ({ dispatch, commit, rootState }, options) {
+  async viewCollects ({ commit, state, rootState }) {
     try {
-      let res = await Request.get(`${API.likesAPI}/${options.likeid}`)
-      if (res && res.users) {
-        let likers = []
-        let bol = false
-        for (let i = 0; i < res.users.length; i++) {
-          const element = res.users[i]
-          if (rootState.userInfo && element === rootState.userInfo.objectId) {
-            bol = true
-          }
-          let userRes = await dispatch('getUser', {userid: element}, {root: true})
-          likers.push(userRes || {})
+      let config = {
+        params: {
+          where: {
+            blog: {
+              '__type': 'Pointer',
+              'className': 'blogList',
+              'objectId': state.blogData.blogid
+            }
+          },
+          include: 'user',
+          order: '-createdAt'
         }
-        commit('setLikeList', likers)
-        commit('setIsLiked', bol)
       }
-      return true
-    } catch (error) {
-      return false
-    }
-  },
-  async likeBlog ({ state, dispatch, rootState }) {
-    try {
-      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
-      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
-      dispatch('viewLikes', {likeid: state.blogData.likeid})
-      return true
-    } catch (error) {
-      return false
-    }
-  },
-  async unlikeBlog ({ state, dispatch, rootState }) {
-    try {
-      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
-      await Request.put(`${API.likesAPI}/${state.blogData.likeid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
-      dispatch('viewLikes', {likeid: state.blogData.likeid})
-      return true
-    } catch (error) {
-      return false
-    }
-  },
-  async viewCommons ({ dispatch, commit }, options) {
-    try {
-      let res = await Request.get(`${API.commentsAPI}/${options.commentid}`)
-      if (res && res.comments) {
-        for (let i = 0; i < res.comments.length; i++) {
-          const element = res.comments[i]
-          let userRes = await dispatch('getUser', {userid: element.userid}, {root: true})
-          element.user = userRes || {}
+      let res = await Request.get(API.collectsAPI, config)
+      let list = (res && res.results) || []
+      let bol = false
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i]
+        if (rootState.userInfo && element.user.userId === rootState.userInfo.userId) {
+          bol = true
         }
-        commit('setComments', res.comments)
       }
+      commit('setCollectList', list)
+      commit('setIsCollected', bol)
       return true
     } catch (error) {
       return false
     }
   },
-  async commentBlog ({ state, dispatch }, options) {
-    try {
-      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {comment: {'__op': 'Increment', 'amount': 1}})
-      await Request.put(`${API.commentsAPI}/${state.blogData.commentid}`, {comments: {'__op': 'Add', 'objects': [options]}})
-      dispatch('viewCommons', {commentid: state.blogData.commentid})
-      return true
-    } catch (error) {
-      return false
-    }
-  },
-  async viewCollects ({ dispatch, commit, rootState }, options) {
-    try {
-      let res = await Request.get(`${API.collectsAPI}/${options.collectid}`)
-      if (res && res.users) {
-        let collectors = []
-        let bol = false
-        for (let i = 0; i < res.users.length; i++) {
-          const element = res.users[i]
-          if (rootState.userInfo && element === rootState.userInfo.objectId) {
-            bol = true
-          }
-          let userRes = await dispatch('getUser', {userid: element}, {root: true})
-          collectors.push(userRes || {})
-        }
-        commit('setCollectList', collectors)
-        commit('setIsCollected', bol)
+  async collectBlog ({ dispatch, state, rootState }) {
+    let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+    let data = {
+      blog: {
+        '__type': 'Pointer',
+        'className': 'blogList',
+        'objectId': state.blogData.blogid
+      },
+      user: {
+        '__type': 'Pointer',
+        'className': 'userInfo',
+        'objectId': infoId
       }
-      return true
-    } catch (error) {
-      return false
     }
-  },
-  async collectBlog ({ state, dispatch, rootState }) {
     try {
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collect: {'__op': 'Increment', 'amount': 1}})
-      await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'AddUnique', 'objects': [rootState.userInfo.objectId]}})
-      dispatch('viewCollects', {collectid: state.blogData.collectid})
+      await Request.post(API.collectsAPI, data)
+      dispatch('viewCollects')
       return true
     } catch (error) {
       return false
     }
   },
-  async uncollectBlog ({ state, dispatch, rootState }) {
+  async uncollectBlog ({ dispatch, state, rootState }) {
     try {
+      let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+      let config = {
+        params: {
+          where: {
+            blog: {
+              '__type': 'Pointer',
+              'className': 'blogList',
+              'objectId': state.blogData.blogid
+            },
+            user: {
+              '__type': 'Pointer',
+              'className': 'userInfo',
+              'objectId': infoId
+            }
+          }
+        }
+      }
       await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {collect: {'__op': 'Increment', 'amount': -1}})
-      await Request.put(`${API.collectsAPI}/${state.blogData.collectid}`, {users: {'__op': 'Remove', 'objects': [rootState.userInfo.objectId]}})
-      dispatch('viewCollects', {collectid: state.blogData.collectid})
+      let collectRes = await Request.get(API.collectsAPI, config)
+      let res = (collectRes && collectRes.results && collectRes.results[0]) || ''
+      await Request.delete(`${API.collectsAPI}/${res.objectId}`)
+      dispatch('viewCollects')
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async viewLikes ({ commit, state, rootState }) {
+    try {
+      let config = {
+        params: {
+          where: {
+            blog: {
+              '__type': 'Pointer',
+              'className': 'blogList',
+              'objectId': state.blogData.blogid
+            }
+          },
+          include: 'user',
+          order: '-createdAt'
+        }
+      }
+      let res = await Request.get(API.likesAPI, config)
+      let list = (res && res.results) || []
+      let bol = false
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i]
+        if (rootState.userInfo && element.user.userId === rootState.userInfo.userId) {
+          bol = true
+        }
+      }
+      commit('setLikeList', list)
+      commit('setIsLiked', bol)
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async likeBlog ({ dispatch, state, rootState }) {
+    try {
+      let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+      let data = {
+        blog: {
+          '__type': 'Pointer',
+          'className': 'blogList',
+          'objectId': state.blogData.blogid
+        },
+        user: {
+          '__type': 'Pointer',
+          'className': 'userInfo',
+          'objectId': infoId
+        }
+      }
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': 1}})
+      await Request.post(API.likesAPI, data)
+      dispatch('viewLikes')
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async unlikeBlog ({ dispatch, state, rootState }) {
+    try {
+      let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+      let config = {
+        params: {
+          where: {
+            blog: {
+              '__type': 'Pointer',
+              'className': 'blogList',
+              'objectId': state.blogData.blogid
+            },
+            user: {
+              '__type': 'Pointer',
+              'className': 'userInfo',
+              'objectId': infoId
+            }
+          }
+        }
+      }
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {like: {'__op': 'Increment', 'amount': -1}})
+      let likeRes = await Request.get(API.likesAPI, config)
+      let res = (likeRes && likeRes.results && likeRes.results[0]) || ''
+      await Request.delete(`${API.likesAPI}/${res.objectId}`)
+      dispatch('viewLikes')
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async viewCommons ({ commit, state }) {
+    try {
+      let config = {
+        params: {
+          where: {
+            blog: {
+              '__type': 'Pointer',
+              'className': 'blogList',
+              'objectId': state.blogData.blogid
+            }
+          },
+          include: 'user',
+          order: '-createdAt'
+        }
+      }
+      let res = await Request.get(API.commentsAPI, config)
+      let list = (res && res.results) || []
+      commit('setComments', list)
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  async commentBlog ({ dispatch, state, rootState }, options) {
+    try {
+      let infoId = (rootState.userInfo && rootState.userInfo.infoId) || ''
+      let data = {
+        blog: {
+          '__type': 'Pointer',
+          'className': 'blogList',
+          'objectId': state.blogData.blogid
+        },
+        user: {
+          '__type': 'Pointer',
+          'className': 'userInfo',
+          'objectId': infoId
+        },
+        comment: options.comment
+      }
+      await Request.put(`${API.blogListAPI}/${state.blogData.blogid}`, {comment: {'__op': 'Increment', 'amount': 1}})
+      await Request.post(API.commentsAPI, data)
+      dispatch('viewCommons')
       return true
     } catch (error) {
       return false
@@ -217,8 +319,7 @@ const actions = {
 const mutations = {
   initData (state) {
     state.blogData = {}
-    state.author = null
-    state.showDelete = false
+    state.isAuthor = false
     state.likeData = {
       list: [],
       isLiked: false
@@ -232,11 +333,14 @@ const mutations = {
   setBlog (state, data) {
     state.blogData = data
   },
-  setAuthor (state, data) {
-    state.author = data
+  setIsAuthor (state, bol) {
+    state.isAuthor = bol
   },
-  setShowDelete (state, bol) {
-    state.showDelete = bol
+  setCollectList (state, list) {
+    state.collectData.list = list
+  },
+  setIsCollected (state, bol) {
+    state.collectData.isCollected = bol
   },
   setLikeList (state, list) {
     state.likeData.list = list
@@ -246,12 +350,6 @@ const mutations = {
   },
   setComments (state, list) {
     state.comments = list
-  },
-  setCollectList (state, list) {
-    state.collectData.list = list
-  },
-  setIsCollected (state, bol) {
-    state.collectData.isCollected = bol
   }
 }
 

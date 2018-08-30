@@ -67,10 +67,11 @@
             <div class="btn-wrapper">
               <div class="common-btn" :class="[blogType === '1' ? 'active' : '']" @click="changeBolgType('1')">{{isAuthor ? '我' : '他'}}发布的</div>
               <div class="common-btn" :class="[blogType === '2' ? 'active' : '']" @click="changeBolgType('2')">{{isAuthor ? '我' : '他'}}收藏的</div>
+              <div class="common-btn" :class="[blogType === '3' ? 'active' : '']" @click="changeBolgType('3')">{{isAuthor ? '我' : '他'}}喜欢的</div>
             </div>
             <div class="info-wrapper">{{formatTime(userData.createdAt, '2')}} 注册</div>
           </div>
-          <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item"></blogCommon>
+          <blogCommon v-for="(item, index) in blogList" :key="index" :blogData="item" :showSign="true"></blogCommon>
         </div>
         <div class="page-tip">
           <span v-if="isEnding">没有更多啦~</span>
@@ -118,7 +119,7 @@ export default {
     document.querySelector('.page-wrapper').addEventListener('scroll', async (e) => {
       if (e.target.offsetHeight + e.target.scrollTop + 100 >= e.target.scrollHeight && !that.isLoading && !that.isEnding) {
         that.isLoading = true
-        await that.viewBlog({userid: that.$route.query.userid, blogType: that.blogType, pageDown: true})
+        await that.viewBlog({userId: that.$route.query.userId, blogType: that.blogType, pageDown: true})
         that.isLoading = false
       }
     })
@@ -130,8 +131,8 @@ export default {
       this.type = '1'
       this.blogType = '1'
       this.isLoading = true
-      await this.getUser({userid: this.$route.query.userid})
-      await this.viewBlog({userid: this.$route.query.userid, blogType: this.blogType})
+      await this.getUser({userId: this.$route.query.userId})
+      await this.viewBlog({infoId: this.$route.query.infoId, blogType: this.blogType})
       this.isLoading = false
     },
     editOpt () {
@@ -205,12 +206,12 @@ export default {
           title: '保存成功'
         })
       }
-      await this.viewBlog({userid: this.$route.query.userid})
+      await this.viewBlog({infoId: this.$route.query.infoId, blogType: this.blogType})
     },
     async changeBolgType (type) {
       this.isLoading = true
       this.blogType = type
-      await this.viewBlog({userid: this.$route.query.userid, blogType: this.blogType})
+      await this.viewBlog({infoId: this.$route.query.infoId, blogType: this.blogType})
       this.isLoading = false
     }
   }

@@ -30,9 +30,10 @@ export default {
   },
   methods: {
     viewUserOpt () {
-      let userid = this.userInfo.objectId || ''
-      if (userid) {
-        this.$router.push({path: '/user', query: {userid}})
+      let userId = this.userInfo.userId || ''
+      let infoId = this.userInfo.infoId || this.userInfo.objectId || ''
+      if (userId && infoId) {
+        this.$router.push({path: '/user', query: {userId, infoId}})
       }
     }
   }

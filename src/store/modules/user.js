@@ -37,12 +37,12 @@ const actions = {
       commit('initData')
       let bol = false
       let config = {params: {keys: '-email,-username'}}
-      if (rootState.userInfo && options.userid === rootState.userInfo.objectId) {
+      if (rootState.userInfo && options.userId === rootState.userInfo.userId) {
         bol = true
         config = {}
       }
       commit('setIsAuthor', bol)
-      let res = await Request.get(`${API.userAPI}/${options.userid}`, config)
+      let res = await Request.get(`${API.userAPI}/${options.userId}`, config)
       if (res) {
         commit('setUserData', res)
       }
@@ -51,20 +51,23 @@ const actions = {
       return false
     }
   },
-  async viewBlog ({ dispatch, commit, state }, options) {
+  async viewBlog ({ commit, state }, options) {
     try {
       let config = {
         params: {
-          where: {userid: options.userid},
+          where: {
+            user: {
+              '__type': 'Pointer',
+              'className': 'userInfo',
+              'objectId': options.infoId
+            }
+          },
+          include: 'user',
+          order: '-createdAt',
           limit: state.pageData.per,
           skip: 0,
           count: 1
         }
-      }
-      if (options.blogType === '1') {
-        config.params.where = {userid: options.userid}
-      } else if (options.blogType === '2') {
-        config.params.where = {collects: options.userid}
       }
       if (options.pageDown) {
         config.params.limit = (state.pageData.page + 1) * state.pageData.per
@@ -78,19 +81,35 @@ const actions = {
         commit('setIsEnding', false)
         commit('setPage', 1)
       }
-      let res = await Request.get(`${API.blogListAPI}`, config)
-      if (res && res.results) {
-        commit('setTotal', res.count || 1)
-        for (let i = 0; i < res.results.length; i++) {
-          const element = res.results[i]
-          let userRes = await dispatch('getUser', {userid: element.userid}, {root: true})
-          element.user = userRes || {}
-        }
-        if (options.pageDown) {
-          commit('setBlogList', state.blogList.concat(res.results))
-        } else {
-          commit('setBlogList', res.results)
-        }
+      let res = null
+      let list = []
+      if (options.blogType === '1') {
+        res = await Request.get(API.blogListAPI, config)
+        list = (res && res.results) || []
+      } else if (options.blogType === '2') {
+        config.params.include = 'blog.user'
+        res = await Request.get(API.collectsAPI, config)
+        let arr = (res && res.results) || []
+        arr.forEach(element => {
+          if (element.paragraph) {
+            list.push(element.blog)
+          }
+        })
+      } else if (options.blogType === '3') {
+        config.params.include = 'blog.user'
+        res = await Request.get(API.likesAPI, config)
+        let arr = (res && res.results) || []
+        arr.forEach(element => {
+          if (element.paragraph) {
+            list.push(element.blog)
+          }
+        })
+      }
+      commit('setTotal', res.count || 1)
+      if (options.pageDown) {
+        commit('setBlogList', state.blogList.concat(list))
+      } else {
+        commit('setBlogList', list)
       }
       return true
     } catch (error) {
@@ -99,8 +118,9 @@ const actions = {
   },
   async updateUser ({ dispatch, rootState }, options) {
     try {
-      await Request.put(`${API.userAPI}/${rootState.userInfo.objectId}`, options, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
-      await dispatch('getUser', {userid: rootState.userInfo.objectId})
+      await Request.put(`${API.userAPI}/${rootState.userInfo.userId}`, options, {headers: {'X-LC-Session': rootState.userInfo.sessionToken}})
+      await Request.put(`${API.userInfoAPI}/${rootState.userInfo.infoId}`, {nickname: options.nickname, avatar: options.avatar, sign: options.sign})
+      await dispatch('getUser', {userId: rootState.userInfo.userId})
       return true
     } catch (error) {
       return false

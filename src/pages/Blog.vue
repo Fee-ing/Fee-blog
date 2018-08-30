@@ -3,31 +3,36 @@
     <div class="page-header">
       <div class="common-btn back-btn" @click="$router.go(-1)">返回</div>
       <div class="page-header-content">
-        <edit-header v-if="type === '1' || showDelete" :showDelete="showDelete"  @add-img="addImg" @clear-html="clearOpt" @deltet-blog="deleteOpt" @add-blog="submitOpt"></edit-header>
-        <div v-else-if="author" class="page-header-title">{{author.nickname}}的博客</div>
+        <edit-header v-if="isAuthor" :showDelete="type === '2' && isAuthor"  @add-img="addImg" @clear-html="clearOpt" @deltet-blog="deleteOpt" @add-blog="submitOpt"></edit-header>
+        <div v-else class="page-header-title">{{blogData.user && blogData.user.nickname}}的博客</div>
       </div>
     </div>
     <div class="page-body">
       <div class="page-body-content">
-        <userCommon v-if="author" :userInfo="author">
+        <userCommon v-if="type === '1'" :userInfo="userInfo">
           <template slot="user-others">
             <div class="info-item">作者</div>
           </template>
         </userCommon>
-        <div id="content-wrapper" class="content-wrapper" :contenteditable="type === '1' || showDelete" v-html="blogData.content"></div>
+        <userCommon v-else :userInfo="blogData.user">
+          <template slot="user-others">
+            <div class="info-item">作者</div>
+          </template>
+        </userCommon>
+        <div id="content-wrapper" class="content-wrapper" :contenteditable="isAuthor" v-html="blogData.content"></div>
         <div class="blog-info" v-if="type === '2'">
           <div class="blog-options">
             <div class="blog-time">{{blogData.type === '1' ? `${formatTime(blogData.createdAt)}发布` : `${formatTime(blogData.updatedAt)}更新`}}</div>
             <div class="blog-view">浏览 {{blogData.view || 0}} 次</div>
             <div class="favor-btn common-btn" @click="likeOpt">{{likeData.isLiked ? '已' : ''}}喜欢</div>
-            <div v-if="!userInfo || blogData.userid !== userInfo.objectId" class="favor-btn common-btn" @click="collectOpt">{{collectData.isCollected ? '已' : ''}}收藏</div>
+            <div v-if="!userInfo || !isAuthor" class="favor-btn common-btn" @click="collectOpt">{{collectData.isCollected ? '已' : ''}}收藏</div>
           </div>
           <div class="blog-likes blog-common" v-if="likeData.list.length > 0">
             <div class="title">喜欢（{{likeData.list.length}}人）：</div>
             <div class="likes-conent">
               <div class="likes-item" v-for="(item, index) in likeData.list" :key="index">
                 <div class="likes-info">
-                  <userCommon :userInfo="item" class="small-avatar"></userCommon>
+                  <userCommon :userInfo="item.user" class="small-avatar"></userCommon>
                 </div>
               </div>
             </div>
@@ -37,7 +42,7 @@
             <div class="likes-conent">
               <div class="likes-item" v-for="(item, index) in collectData.list" :key="index">
                 <div class="likes-info">
-                  <userCommon :userInfo="item" class="small-avatar"></userCommon>
+                  <userCommon :userInfo="item.user" class="small-avatar"></userCommon>
                 </div>
               </div>
             </div>
@@ -54,7 +59,7 @@
                 <div class="comments-item" v-for="(item, index) in comments" :key="index">
                   <div class="comments-user">
                     <userCommon :userInfo="item.user" class="small-avatar"></userCommon>
-                    <div class="comments-time">{{formatTime(item.time)}}</div>
+                    <div class="comments-time">{{formatTime(item.createdAt)}}</div>
                   </div>
                   <div class="comments-detail">{{item.comment}}</div>
                 </div>
@@ -95,7 +100,7 @@ export default {
       this.type = '1'
     }
     await this.getBlog({type: this.type, blogid: this.$route.query.blogid || ''})
-    if (this.type === '2' && (!this.userInfo || this.blogData.userid !== this.userInfo.objectId)) {
+    if (this.type === '2' && (!this.userInfo || (this.blogData.user && this.blogData.user.userId !== this.userInfo.userId))) {
       this.viewBlog()
     }
   },
@@ -106,7 +111,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'blogData', 'author', 'showDelete', 'likeData', 'collectData', 'comments'])
+    ...mapGetters(['userInfo', 'blogData', 'isAuthor', 'likeData', 'collectData', 'comments'])
   },
   methods: {
     ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'commentBlog', 'uncollectBlog', 'collectBlog']),
@@ -174,6 +179,7 @@ export default {
     },
     clearOpt () {
       this.contentWrapper.innerHTML = ''
+      this.contentWrapper.focus()
     },
     async deleteOpt () {
       let res = await this.deleteBlog()
@@ -260,12 +266,7 @@ export default {
         })
         return
       }
-      let params = {
-        userid: this.userInfo.objectId,
-        comment,
-        time: new Date()
-      }
-      let res = await this.commentBlog(params)
+      let res = await this.commentBlog({comment})
       if (res) {
         this.commentContent = ''
       }
