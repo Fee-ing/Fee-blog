@@ -48,7 +48,7 @@
             </div>
           </div>
           <div class="blog-comments blog-common">
-            <div class="title">评论（{{comments.length}}条）：</div>
+            <div class="title">评论（{{commentData.total}}条）：</div>
             <div class="comments-content">
               <textarea cols="30" rows="3" placeholder="不超过100字" class="comments-input" v-model="commentContent"></textarea>
               <div class="comments-options">
@@ -56,7 +56,7 @@
                 <div class="comments-btn common-btn" @click="commentOpt">提交评论</div>
               </div>
               <div class="comments-list">
-                <div class="comments-item" v-for="(item, index) in comments" :key="index">
+                <div class="comments-item" v-for="(item, index) in commentData.list" :key="index">
                   <div class="comments-user">
                     <userCommon :userInfo="item.user" class="small-avatar"></userCommon>
                     <div class="comments-time">{{formatTime(item.createdAt)}}</div>
@@ -66,6 +66,10 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="page-tip">
+          <span v-if="commentData.isEnding">没有更多评论啦~</span>
+          <span v-else-if="!commentData.isEnding && isLoading && commentData.total >= 15">加载中~</span>
         </div>
       </div>
     </div>
@@ -86,7 +90,8 @@ export default {
     return {
       contentWrapper: null,
       type: '1',
-      commentContent: ''
+      commentContent: '',
+      isLoading: false
     }
   },
   components: {
@@ -109,12 +114,22 @@ export default {
     if (!this.$route.query.blogid) {
       this.contentWrapper.focus()
     }
+    let that = this
+    this.$nextTick(() => {
+      document.querySelector('.editor-wrapper').addEventListener('scroll', async (e) => {
+        if (that.type === '2' && e.target.offsetHeight + e.target.scrollTop + 100 >= e.target.scrollHeight && !that.isLoading && !that.commentData.isEnding) {
+          that.isLoading = true
+          await that.viewCommons({pageDown: true})
+          that.isLoading = false
+        }
+      })
+    })
   },
   computed: {
-    ...mapGetters(['userInfo', 'blogData', 'isAuthor', 'likeData', 'collectData', 'comments'])
+    ...mapGetters(['userInfo', 'blogData', 'isAuthor', 'likeData', 'collectData', 'commentData'])
   },
   methods: {
-    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'commentBlog', 'uncollectBlog', 'collectBlog']),
+    ...mapActions(['getBlog', 'createBlog', 'updateBlog', 'deleteBlog', 'likeBlog', 'unlikeBlog', 'viewBlog', 'viewCommons', 'commentBlog', 'uncollectBlog', 'collectBlog']),
     formatTime,
     insertHtmlAtCaret (str) {
       let sel, range
@@ -375,6 +390,9 @@ export default {
           }
         }
       }
+    }
+    .page-tip{
+      margin-top: 15px;
     }
   }
 }

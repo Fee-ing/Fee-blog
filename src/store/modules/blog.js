@@ -12,7 +12,13 @@ const state = {
     list: [],
     isLiked: false
   },
-  comments: []
+  commentData: {
+    page: 1,
+    per: 15,
+    total: 1,
+    isEnding: false,
+    list: []
+  }
 }
 
 const getters = {
@@ -31,8 +37,8 @@ const getters = {
   likeData: (state) => {
     return state.likeData
   },
-  comments: (state) => {
-    return state.comments
+  commentData: (state) => {
+    return state.commentData
   }
 }
 
@@ -267,7 +273,7 @@ const actions = {
       return false
     }
   },
-  async viewCommons ({ commit, state }) {
+  async viewCommons ({ commit, state }, options) {
     try {
       let config = {
         params: {
@@ -279,12 +285,32 @@ const actions = {
             }
           },
           include: 'user',
-          order: '-createdAt'
+          order: '-createdAt',
+          limit: state.commentData.per,
+          skip: 0,
+          count: 1
         }
       }
+      if (options && options.pageDown) {
+        config.params.limit = (state.commentData.page + 1) * state.commentData.per
+        config.params.skip = (state.commentData.page) * state.commentData.per
+        if (state.commentData.total <= config.params.skip) {
+          commit('setCommentEnding', true)
+          return true
+        }
+        commit('setCommentPage', state.commentData.page + 1)
+      } else {
+        commit('setCommentEnding', false)
+        commit('setCommentPage', 1)
+      }
       let res = await Request.get(API.commentsAPI, config)
+      commit('setCommentTotal', res.count || 0)
       let list = (res && res.results) || []
-      commit('setComments', list)
+      if (options && options.pageDown) {
+        commit('setCommentList', state.commentData.list.concat(list))
+      } else {
+        commit('setCommentList', list)
+      }
       return true
     } catch (error) {
       return false
@@ -348,8 +374,17 @@ const mutations = {
   setIsLiked (state, bol) {
     state.likeData.isLiked = bol
   },
-  setComments (state, list) {
-    state.comments = list
+  setCommentList (state, list) {
+    state.commentData.list = list
+  },
+  setCommentPage (state, num) {
+    state.commentData.page = num
+  },
+  setCommentTotal (state, num) {
+    state.commentData.total = num
+  },
+  setCommentEnding (state, bol) {
+    state.commentData.isEnding = bol
   }
 }
 
